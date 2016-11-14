@@ -37,6 +37,10 @@ $(document).ready(function() {
     researchComplaint=false;
     challengeComplaint=false;
 
+    //booleans to limit number of error messages
+    researchComplaint=false;
+    challengeComplaint=false;
+
     // load the requested entry if we have one
     var currentEntry = undefined
     if (querystring.e) {
