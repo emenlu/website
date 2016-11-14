@@ -33,13 +33,8 @@ $(document).ready(function() {
     }
     updateCollectionList()
 
-    //booleans to limit number of error messages
-    researchComplaint=false;
-    challengeComplaint=false;
-
-    //booleans to limit number of error messages
-    researchComplaint=false;
-    challengeComplaint=false;
+    var researchComplaint=false;
+    var challengeComplaint=false;
 
     // load the requested entry if we have one
     var currentEntry = undefined
