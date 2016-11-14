@@ -309,12 +309,12 @@ $(document).ready(function() {
         if (entry.entryType == "research") {
             if (researchComplaint==false && entry.reference.length < 1) {
                 researchComplaint=true;
-                $("#reference-area").append(el("div").addClass("complaint").text("please supply information"));
+                $("#reference-area").append(jqEl("div").addClass("complaint").text("please supply information"));
             }
         } else if (entry.entryType == "challenge") {
             if (challengeComplaint==false && entry.description.length < 1) {
                 challengeComplaint=true;
-                $("#description-area").append(el("div").addClass("complaint").text("please supply information"));
+                $("#description-area").append(jqEl("div").addClass("complaint").text("please supply information"));
             }
         }
     }
