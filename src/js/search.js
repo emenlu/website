@@ -199,7 +199,7 @@ $(document).ready(function() {
             window.api.ajax("POST", window.api.host + "/v1/collection/", {
                 name: $('.large-input').val()
             }).done(res => {
-                var collectionId = res.id;
+                var collectionId = res.id
                 submitToCollection(collectionId)
             })
         }
