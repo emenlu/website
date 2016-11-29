@@ -54,7 +54,7 @@ $(document).ready(function() {
                         unique.push(entity[j])
                 }
             }
-            
+
             window.modals.infoModal(facet,unique),function () {
             }
         }
@@ -178,9 +178,66 @@ $(document).ready(function() {
             return
         }
 
+<<<<<<< b9b19e049dece23ed0ae827bbb5cecce55317d4c
         window.modals.exportModal(selectedEntries, collections)
         selectedEntries = []
         $('input[type=checkbox]').prop('checked', false)
+=======
+        function submitToCollection(cID) {
+            var url = window.api.host + "/v1/collection/" + cID + "/addEntry"
+            selectedEntries.forEach(eID => {
+                window.api.ajax("POST", url, {
+                    entryId: eID
+                })
+                $('input[type=checkbox]').prop('checked', false)
+            })
+            selectedEntries = []
+            $modal.remove()
+        }
+
+        function newCollection() {
+            window.api.ajax("POST", window.api.host + "/v1/collection/", {
+                name: $('.large-input').val()
+            }).done(res => {
+                var collectionId = res.id;
+                submitToCollection(collectionId)
+            })
+        }
+
+        function existingCollection() {
+            submitToCollection($('#existing').val())
+        }
+
+        var $modal = el("div").addClass("modal")
+
+        $("body").on("click", function(evt) {
+           if (evt.target.className === "modal")
+                $(".modal").remove()
+        })
+
+        // remove modal view if escape key is pressed
+        // FIXME: This is registered globally, so they all accumulate
+        $(document).keydown(function(e) {
+            if (e.keyCode === 27) {
+                $(".modal").remove()
+            }
+        })
+
+        var $content = el("div")
+            .append(el("div").addClass("close-btn").click(() => $(".modal").remove()))
+            .append(el("div").addClass("modal-entry-type").text(`export entries (${selectedEntries.length})`))
+            .append(el("modal-entry-title").text("select collection"))
+            .append(el("div").addClass("modal-divider"))
+            .append(el("input").attr("type", "text").attr("placeholder", "new collection name").addClass('large-input'))
+            .append(el("button").addClass("edit-btn").text("create new").click(newCollection))
+            .append(el("div").addClass("modal-divider"))
+            .append(el("select").attr('id', 'existing').append(Object.keys(collections).map(
+                coll => el("option").val(collections[coll].id).text(collections[coll].name)
+            )))
+            .append(el("button").addClass("edit-btn").text("use existing").click(existingCollection))
+
+        $modal.append($content)
+        $("body").append($modal)
     }
 
     // Append a select element if logged in so user can export to new/existing
