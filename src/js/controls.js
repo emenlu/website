@@ -33,6 +33,7 @@
 		this.sigma = instance
 		this._listeners = []
 		this._node = undefined
+		this._activeFilters = []
 
 		instance.bind("clickNode", evt => {
 			if (evt.data.node.selected)
@@ -51,6 +52,7 @@
 			if (n._color)
 				n.color = n._color
 		})
+		this.sigma.graph.edges().forEach(e => e.highlight = false)
 		this.filter.undo().apply()
 		this._fire('reset')
 	}
@@ -65,6 +67,33 @@
 		}
 	}
 
+	controls.prototype._selectFacet = function(node) {
+		node.filterStack = (node.filterStack || 0) + 1
+		if (node.filterStack === 1) {
+			this._activeFilters.push(node.id)
+			node.selected = true
+			var adjacent = this.sigma.graph.neighbors(node.id)
+			this.filter.nodesBy(n => {
+				return adjacent[n.id] || n.category === CATEGORY_FACET
+			}, `facet-${node.id}-filter`)
+		}
+	}
+
+	controls.prototype._deselectFacet = function(node) {
+		node.filterStack = node.filterStack - 1
+		if (node.filterStack === 0) {
+			var idx = this._activeFilters.indexOf(node.id)
+			this._activeFilters.splice(idx, 1)
+
+			node.selected = false
+			this.filter.undo(`facet-${node.id}-filter`)
+		}
+	}
+
+	controls.prototype.activeFilters = function () {
+		return this._activeFilters
+	}
+
 	controls.prototype.deselect = function (node) {
 		if (this._node &&
 			this._node.category !== CATEGORY_FACET &&
@@ -73,10 +102,14 @@
 
 		node.previouslySelected = node.selected
 		node.selected = false
-		if (node.category === CATEGORY_FACET)
-			this.filter.undo(`facet-${node.id}-filter`)
-		else
+		if (node.category === CATEGORY_FACET) {
+			node.filterStack = 1
+			this._deselectFacet(node)
+		} else {
 			this.filter.undo(`node-${node.id}-filter`)
+			var facets = this.sigma.graph.neighbors(node.id)
+			for (k in facets) this._deselectFacet(facets[k])
+		}
 
 		/* Colors for nodes that were gray must be restored, but instead of
 		 * checking if some other filter exists that forces the node to retain
@@ -93,8 +126,9 @@
 	}
 
 	controls.prototype.select = function (node) {
-		if (this._node && node.category !== CATEGORY_FACET)
+		if (this._node && node.category !== CATEGORY_FACET) {
 			this.deselect(this._node)
+		}
 
 		if (node.category !== CATEGORY_FACET)
 			this._node = node
@@ -105,10 +139,7 @@
 		/* however we filter, always keep facets visible */
 		if (node.category === CATEGORY_FACET) {
 			/* clicked on facet: filter out all nodes that aren't connected */
-			var adjacent = this.sigma.graph.neighbors(node.id)
-			this.filter.nodesBy(n => {
-				return adjacent[n.id] || n.category === CATEGORY_FACET
-			}, `facet-${node.id}-filter`)
+			this._selectFacet(node)
 		} else {
 			/* Clicked on node: do matching based on complete and incomplete
 			 * matches, see: https://trello.com/c/HcpPVQoK
@@ -119,41 +150,56 @@
 			 * SERP for constructing objects from subfacets.
 			 */
 			var facets = this.sigma.graph.neighbors(node.id)
-			var ref = new SERP()
-			SERP.forEach((f, k) => {
-				/* nodes are keyed by their graph ids, so lookup subfacet id */
-				if (facets[window.explore_conf.id_lookup(k)])
-					ref.set(f, k, true)
-			})
+			for (k in facets) {
+				this._selectFacet(facets[k])
+			}
 
-			this.filter.nodesBy((n) => {
-				/* early bail for facets b/c we always want to show them */
-				if (n.category === CATEGORY_FACET) return true
-				if (node === n) return true
+			var edges = this.sigma.graph.edges()
+			for (var i = 0; i < edges.length; i++) {
+				var edge = edges[i]
 
-				var rec = new SERP()
-				var has = this.sigma.graph.neighbors(n.id)
+				if (edge.source !== node.id)
+					continue
+				else
+					edge.highlight = true
+			}
+			
+			// var ref = new SERP()
+			// SERP.forEach((f, k) => {
+			// 	/* nodes are keyed by their graph ids, so lookup subfacet id */
+			// 	if (facets[window.explore_conf.id_lookup(k)])
+			// 		ref.set(f, k, true)
+			// })
 
-				SERP.forEach((f, k) => {
-					if (has[window.explore_conf.id_lookup(k)])
-						rec.set(f, k, true)
-				})
+			// this.filter.nodesBy((n) => {
+			// 	/* early bail for facets b/c we always want to show them */
+			// 	if (n.category === CATEGORY_FACET) return true
+			// 	if (node === n) return true
 
-				var complete = ref.isCompleteMatch(rec)
-				if (complete)
-					return true
+			// 	var rec = new SERP()
+			// 	var has = this.sigma.graph.neighbors(n.id)
 
-				var incomplete = ref.isIncompleteMatch(rec)
-				if (incomplete) {
-					// TODO Make
-					if (!n._color)
-						n._color = n.color
-					n.color = '#AAA'
-					return true
-				}
+			// 	SERP.forEach((f, k) => {
+			// 		if (has[window.explore_conf.id_lookup(k)])
+			// 			rec.set(f, k, true)
+			// 	})
 
-				return false
-			}, `node-${node.id}-filter`)
+			// 	var complete = ref.isCompleteMatch(rec)
+			// 	if (complete)
+			// 		return true
+
+			// 	var incomplete = ref.isIncompleteMatch(rec)
+			// 	if (incomplete) {
+			// 		// TODO Make
+			// 		if (!n._color)
+			// 			n._color = n.color
+			// 		n.color = '#AAA'
+			// 		return true
+			// 	}
+
+			// 	return false
+			// }, `node-${node.id}-filter`)
+			
 		}
 
 		this.filter.apply()
