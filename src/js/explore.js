@@ -55,8 +55,10 @@
 				
 				if (!entryId) return
 
-				var edges = instance.graph.edges()
 				var filters = ctrl.activeFilters()
+				if (!filters.length) return
+
+				var edges = instance.graph.edges()
 				var filterNode = ctrl._node
 
 				for (var i = 0; i < edges.length; i++) {
@@ -72,6 +74,7 @@
 						edge.highlight = true
 					}
 				}
+				
 				instance.refresh({skipIndexation: true})
 			}, false)
 
@@ -90,7 +93,7 @@
 					into.style.width = '100%'
 				
 				instance.renderers[0].resize()
-				instance.refresh()
+				instance.refresh({skipIndexation: true})
 			}, false)
 		}
 	}
