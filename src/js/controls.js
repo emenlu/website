@@ -53,6 +53,7 @@
 				n.color = n._color
 		})
 		this.sigma.graph.edges().forEach(e => e.highlight = false)
+		this._activeFilters = []
 		this.filter.undo().apply()
 		this._fire('reset')
 	}
