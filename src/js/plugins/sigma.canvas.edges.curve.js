@@ -56,8 +56,16 @@
           break;
       }
 
+    /* EDIT: Add edge.highlight stuff */
     context.strokeStyle = color;
-    context.lineWidth = edge[prefix + 'size'] || 1;
+    if (edge.highlight) {
+      context.lineWidth = 3 * (edge[prefix + 'size'] || 1);
+      context.shadowBlur    = 2;
+      context.shadowColor   = "#0A0A0A";
+    } else {
+      context.lineWidth = edge[prefix + 'size'] || 1;
+    }
+
     context.beginPath();
     context.moveTo(sX, sY);
     if (source.id === target.id) {
@@ -66,5 +74,9 @@
       context.quadraticCurveTo(controlX, controlY, tX, tY);
     }
     context.stroke();
+    
+    /* EDIT: Reset edge highlight */
+    context.shadowBlur    = 0;
+    context.shadowColor   = undefined;
   };
 })();
