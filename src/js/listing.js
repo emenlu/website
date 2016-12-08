@@ -143,8 +143,8 @@
 			.filter(n => !n.hidden)
 			.filter(n => n.category !== CATEGORY_FACET)
 
-		while (visible.length) {
-			var node = visible.shift()
+		for (var i = 0; i < visible.length; i++) {
+			var node = visible[i]
 
 			// id = '?XYZ' where XYZ is index in chl/res array
 			var idx = node.revid.substr(1)
