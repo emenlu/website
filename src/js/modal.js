@@ -254,6 +254,7 @@ window.addEventListener('load', () => {
 	document.body.addEventListener('click', (evt) => {
 		var remove = evt.target.classList.contains('modal') ||
 					 evt.target.classList.contains('confirm')
+
 		if (remove)
 			document.body.removeChild(evt.target)
 	}, false)
