@@ -1,7 +1,8 @@
 $(function() {
     // Load logged in user and proceed to setup otherwise redirect to login
     window.user.self().done(setup).fail(toLogin)
-
+    //stores friends emails of the logged in user
+    var friends = [];
     // Switch all buttons between disabled and enabled state
     function toggleButtonState() {
         var btns = document.querySelectorAll('.btn')
@@ -49,7 +50,7 @@ $(function() {
 
     // Let user confirm account deletion before commencing orbital strike
     $("#delete").click(evt => {
-		var warning = "This will delete your accont, but your collections and entries will remain. Are you sure?"
+		var warning = "This will delete your account, but your collections and entries will remain. Are you sure?"
 
 		var deleteModal = new window.modal(
 			[el('div.modal-header-title', ['delete account'])],
@@ -90,7 +91,7 @@ $(function() {
 		)
 		createCollection.cancel("cancel")
 		createCollection.confirm('create', (evt) => {
-			createCollection.toggleButtonState()	
+			createCollection.toggleButtonState()
 
             window.api.ajax("POST", window.api.host + "/v1/collection/", {
                 name: document.getElementById('name').value
@@ -140,7 +141,6 @@ $(function() {
 
         save.addEventListener('click', (evt) => {
             toggleButtonState()
-
             window.api.ajax("POST", window.api.host + "/v1/account/change-password", {
                 old: $('#old').val(),
                 new: $('#new').val()
@@ -152,7 +152,6 @@ $(function() {
                 toggleButtonState()
             })
         }, false)
-
         document.body.appendChild(modal)
         modal.querySelector('input').focus()
     })
@@ -180,17 +179,20 @@ $(function() {
         var parent = this.parentNode.parentNode.parentNode
         var id = parent.dataset.collectionId
         var name = parent.querySelector('.collection-title').textContent
-
+      //  alert("this is right button");
         var send = el('button.btn', ['send'])
+
         var cancel = el('button.btn', ['cancel'])
-        var modal = el('div.modal', [el('div', [
+        var modal = el('div.modal', [el('div#modal', [
             el("div.modal-entry-type", [String(name)]),
             el("div.modal-header-title", ["send invite"]),
+            //el("class","ui-front"),
             el("div.modal-divider"),
             el('input#email.submit-input-box', {
                 placeholder : 'user email',
                 type : 'email',
                 name : 'email'
+              //  id: "test"
             }),
             el("div.modal-divider"),
             send, cancel
@@ -221,6 +223,10 @@ $(function() {
         }, false)
 
         document.body.appendChild(modal)
+        $("#email").autocomplete({
+          source: friends,
+          appendTo: "#modal"
+        });
         modal.querySelector('input').focus()
     }
 
@@ -303,6 +309,9 @@ $(function() {
             div.insertBefore(a, div.lastChild)
             div.insertBefore(b, div.lastChild)
         }
+        window.user.friends(self.email).done(data =>{
+          friends = data;
+        })
     }
 
 })
