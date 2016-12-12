@@ -1,7 +1,8 @@
 $(function() {
     // Load logged in user and proceed to setup otherwise redirect to login
     window.user.self().done(setup).fail(toLogin)
-
+    //stores friends emails of the logged in user
+    var friends = [];
     // Switch all buttons between disabled and enabled state
     function toggleButtonState() {
         var btns = document.querySelectorAll('.btn')
@@ -14,54 +15,52 @@ $(function() {
         }
     }
     
-      var deleteAccountModal = {  
-            desc: "Delete Account",
-            message: "This will delete your account, but your collections and entries will remain. Are you sure?",
-            //message above input boxes
-            input: [],
-            //[textbox names, types, placeholder] //else put '[]'
-            //automatically takes input[0] as first paramater for method passed in.. etc
-            btnText: "Delete"
-            //text on button
-        };
+    var deleteAccountModal = {  
+        desc: "Delete Account",
+        message: "This will delete your account, but your collections and entries will remain. Are you sure?",
+        //message above input boxes
+        input: [],
+        //[textbox names, types, placeholder] //else put '[]'
+        //automatically takes input[0] as first paramater for method passed in.. etc
+        btnText: "Delete"
+        //text on button
+    };
 
-        // Let user confirm account deletion before commencing orbital strike
-        $("#delete").click(evt => { 
-            window.modals.optionsModal(deleteAccountModal,function () {
-                //A secondary box pops up to imply importance of the decision
-                var message= "Delete Account - Are You Sure"
-                window.modals.confirmPopUp(message, function () {
-                
-                    window.user.delete()
-                    .done(ok => {
-                        toLogin()
-                    })
-                    .fail(xhr => {
-                        $('.modal-complaint').remove()
-                        var error = document.getElementById('cancel')
-                        error.parentNode.insertBefore(el('div.modal-complaint', [
-                        xhr.responseText ]), error.nextSibling)
-                        this.modal.window.profile.toggleButtonState()
-                    })
+    // Let user confirm account deletion before commencing orbital strike
+    $("#delete").click(evt => { 
+        window.modals.optionsModal(deleteAccountModal, function () {
+            //A secondary box pops up to imply importance of the decision
+            var message = "Delete Account - Are You Sure"
+            window.modals.confirmPopUp(message, function ok() {
+                window.user.delete().done(toLogin)
+                .fail(xhr => {
+                    $('.modal-complaint').remove()
+                    var error = document.getElementById('cancel')
+                    error.parentNode.insertBefore(el('div.modal-complaint', [
+                        xhr.responseText
+                    ]), error.nextSibling)
+
+                    this.modal.toggleButtonState()
                 })
             })
         })
-
+    })
 
     var newCollectionModal = {  
-            desc: "create new collection",
-            message: "",
-            //message above input boxes
-            input: [['input0','text','collection name']],
-            //[textbox names, types, placeholder] //else put '[]'
-            //automatically takes input[0] as first paramater for method passed in.. etc
-            btnText: "Create"
-            //text on button
-        };
-        // Create a new collection
-        $("#create").click(evt => {
-            window.modals.optionsModal(newCollectionModal,function (name) {
-                window.user.createCollection(name)
+        desc: "create new collection",
+        message: "",
+        //message above input boxes
+        input: [['input0','text','collection name']],
+        //[textbox names, types, placeholder] //else put '[]'
+        //automatically takes input[0] as first paramater for method passed in.. etc
+        btnText: "Create"
+        //text on button
+    };
+    
+    // Create a new collection
+    $("#create").click(evt => {
+        window.modals.optionsModal(newCollectionModal, function (name) {
+            window.user.createCollection(name)
                 .done(ok => {
                     document.body.removeChild(this.modal)
                     window.user.self().done(update)
@@ -73,72 +72,92 @@ $(function() {
                     xhr.responseText ]), error.nextSibling)
                     this.modal.toggleButtonState()
                 })
-            })
         })
+    })
 
     // Change password dialog, must submit current and new passwords to api
-      var newPasswordModal = {  
-            desc: "Change your password",
-            message: "",
-            //message above input boxes
-            input: [['input0','password','old password'],['input1','password','new password']],
-            //[textbox names, types, placeholder] //else put '[]'
-            //automatically takes input[0] as first paramater for method passed in.. etc
-            btnText: "Save"
-            //text on button
-        };
+    var newPasswordModal = {  
+        desc: "Change your password",
+        message: "",
+        //message above input boxes
+        input: [['input0','password','old password'], ['input1','password','new password']],
+        //[textbox names, types, placeholder] //else put '[]'
+        //automatically takes input[0] as first paramater for method passed in.. etc
+        btnText: "Save"
+        //text on button
+    };
 
     $("#change").click(evt => {
-            window.modals.optionsModal(newPasswordModal,function (oldpw, newpw) {
-                //modal.js.typeOfModal(relativeObject, parameters for relevant method)
-                window.user.changePassword(oldpw, newpw)
-                // method called from user.js
-                .done(ok => {
-                    document.body.removeChild(this.modal)
-                    window.user.self().done(update)
-                })
-                .fail(xhr => {
-                    $('.modal-complaint').remove()
-                    var error = document.getElementById('cancel')
-                    error.parentNode.insertBefore(el('div.modal-complaint', [
-                        xhr.responseText ]), error.nextSibling)
-                    this.modal.toggleButtonState()
-                })
+        window.modals.optionsModal(newPasswordModal,function (oldpw, newpw) {
+            window.user.changePassword(oldpw, newpw)
+            .done(ok => {
+                document.body.removeChild(this.modal)
+                window.user.self().done(update)
+            })
+            .fail(xhr => {
+                $('.modal-complaint').remove()
+                var error = document.getElementById('cancel')
+                error.parentNode.insertBefore(el('div.modal-complaint', [
+                    xhr.responseText
+                ]), error.nextSibling)
+                this.modal.toggleButtonState()
             })
         })
+    })
+
+    document.addEventListener('keydown', function (evt) {
+        if (evt.keyCode === 27) {
+            var modal = document.querySelector('.modal')
+            if (!modal) return
+            document.body.removeChild(modal)
+        }
+    })
+
+    window.addEventListener('load', () => {
+        document.body.addEventListener('click', function (evt) {
+            if (evt.target.className === "modal")
+                document.body.removeChild(evt.target)
+        }, false)
+    })
 
     function toLogin() {
     	window.location = "/login.html"
     }
 
-function invite(evt) {
+    function invite(evt) {
         var parent = this.parentNode.parentNode.parentNode
         var id = parent.dataset.collectionId
         var name = parent.querySelector('.collection-title').textContent
 
-
         var inviteUserModal = {  
-        desc: "Invite User to " + name,
-        message: "",
-        input: [['input0','email','user email']],
-        btnText: "Send"
-        //text on button
-    }   
-         window.modals.optionsModal(inviteUserModal,function (email) {
-                //modal.js.typeOfModal(relativeObject, parameters for relevant method)
-                window.user.collectionInvite(email,id)
-                .done(ok => {
-                    document.body.removeChild(this.modal)
-                    window.user.self().done(update)
-                })
-                .fail(xhr => {
-                    $('.modal-complaint').remove()
-                    var error = document.getElementById('cancel')
-                    error.parentNode.insertBefore(el('div.modal-complaint', [
-                    xhr.responseText ]), error.nextSibling)
-                    this.modal.toggleButtonState()
-                })
+            desc: "Invite User to " + name,
+            message: "",
+            input: [['input0','email','user email']],
+            btnText: "Invite"
+            //text on button
+        }   
+
+        window.modals.optionsModal(inviteUserModal,function (email) {
+            window.user.collectionInvite(email,id)
+            .done(ok => {
+                document.body.removeChild(this.modal)
+                window.user.self().done(update)
+            })
+            .fail(xhr => {
+                $('.modal-complaint').remove()
+                var error = document.getElementById('cancel')
+                error.parentNode.insertBefore(el('div.modal-complaint', [
+                xhr.responseText ]), error.nextSibling)
+                this.modal.toggleButtonState()
+            })
         })
+
+        $("#input0").autocomplete({
+          source: friends,
+          appendTo: "#modal"
+        });
+
+        document.querySelector('#input0').focus()
     }
 
     function submit(evt) {
@@ -220,6 +239,9 @@ function invite(evt) {
             div.insertBefore(a, div.lastChild)
             div.insertBefore(b, div.lastChild)
         }
+        window.user.friends(self.email).done(data =>{
+          friends = data;
+        })
     }
 
 })
