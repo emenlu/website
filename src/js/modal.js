@@ -1,6 +1,7 @@
-$(function (){
+$(document).ready(function() {
 
 	var modals = window.modals = {}
+	var modalAnimation = 121
 
 // Modal Template
 	// var modalObject = {  
@@ -44,8 +45,128 @@ $(function (){
         return btn
     }
 
-    /* Create simple modal */
+	modals.exportModal = function(selectedEntries, collections) {
+       	var options = []
+       	var index = Object.keys(collections)
+       	var editBtn = el('div.edit-btn', ['use existing'])
+       	var createBtn = el('div.edit-btn', ['create new'])
+       	var input = el("input#exportInput.large-input", {
+			placeholder: 'new collection name',
+			type: 'text',
+			name: 'input'
+		})
+
+       	var select = el("select#exportSelect", [
+			index.map(idx => el("option", {
+				value: collections[idx].id,
+				name: collections[idx].name,
+				text: collections[idx].name
+			}))
+		])
+
+		var modal = el('div#modal.modal', [
+			el('div', [
+				el('div.modal-entry-type', ['export entries (' + selectedEntries.length + ')']),
+				closeButton(),
+				el('div.modal-header-title', ['select collection']),
+				el("div.modal-divider"),
+				input,
+				createBtn,
+				el("div.modal-divider"),
+				select, editBtn
+			])	
+		])
+
+		function submitToCollection(cID) {
+            var url = window.user.collectionUrl(cID)
+            selectedEntries.forEach(eID => {
+            	window.user.putIntoCollection(url, eID)
+            })
+            document.body.removeChild(modal)
+        }
+
+		createBtn.addEventListener('click', (evt) => {
+		  	window.user.createCollection($('#exportInput').val())
+               .done(cID => {
+                submitToCollection(cID.id)
+            })
+	    })
+
+		editBtn.addEventListener('click', (evt) => {
+		    submitToCollection($('#exportSelect').val())
+	    })
+		
+		setTimeout(function(){
+			document.getElementById('modal').classList.add('appear');
+		}, modalAnimation)
+        document.body.appendChild(modal)
+	}
+
+	/* Inspect facets modal */
+	modals.infoModal = function(facet, unique) {
+		var facets = unique.map(uniq => el("li.modal-li", [uniq]))
+
+		var modal = el('div#modal.modal', [
+			el('div', [
+				el('div.modal-entry-type', ['inspecting entities']),
+				closeButton(),
+				el('div.modal-header-title', [facet]),
+				el("div.modal-divider"),
+				el('ul.modal-ul'),
+				facets,
+				el('ul.modal-ul')
+			])	
+		])
+
+        document.body.appendChild(modal)
+        setTimeout(function(){
+			document.getElementById('modal').classList.add('appear');
+		}, modalAnimation)
+	 }
+
+	/* Create a modal that displays contents of an entry & an edit button */
+	modals.entryModal = function(entry, taxonomy) {
+       	var editBtn = el('button#editBtn.edit-btn', ['edit'])
+		var modal = el('div#modal.modal', [
+			el('div',[
+				el('div.modal-entry-type', [entry.type]),
+				closeButton(),
+				el('div.modal-header-title', [`entry #${entry.id}`]),
+				el("div.modal-divider"),
+				window.central.constructFacet(taxonomy, "Intervention"),
+				window.central.constructFacet(taxonomy, "Effect"),
+				window.central.constructFacet(taxonomy, "Scope"),
+				window.central.constructFacet(taxonomy, "Context"),
+				el("div.modal-divider"),
+				entry.type === "challenge" ? [
+					el('div.modal-header-title', ['Description']),
+					el('div.modal-sub-item', [entry.description]),
+					el("div.modal-divider")
+				] : [
+					el('div.modal-header-title', ['References']),
+					el('div.modal-sub-item', [entry.reference]),
+					el('div.modal-header-title', ['DOI']),
+					el('div.modal-sub-item', [entry.doi]),
+					el("div.modal-divider")
+				],
+				editBtn
+			])	
+		])
+
+		editBtn.addEventListener("click", function(evt) {
+            $(".modal").remove();
+            window.location = `/submit.html?e=${entry.id}`;
+        });
+	    
+	    document.body.appendChild(modal)
+        setTimeout(function(){
+			document.getElementById('modal').classList.add('appear');
+		}, modalAnimation)
+	 }
+
+	/* Create simple modal */
     modals.confirmPopUp = function(desc, method) {
+ 		var closeBtn = el('div.close-btn', [''])
  		var confirmBtn = el('button#confirm.btn', ['confirm'])
  		
  		var modal = el('div.confirm', [
@@ -64,7 +185,6 @@ $(function (){
 
         document.body.appendChild(modal)	
 	 }
-
 
     /**
      * Create configurable modal.
@@ -96,7 +216,7 @@ $(function (){
         //creates optional button
         var button1 = el('button.btn', [obj.btnText])
 
-        var modal = el('div.modal', [
+        var modal = el('div#modal.modal', [
             el('div', [
                 closeButton(),
                 el("div.modal-header-title", [obj.desc]),
@@ -118,6 +238,9 @@ $(function (){
         })
 
         document.body.appendChild(modal)
+		setTimeout(function() {
+			document.getElementById('modal').classList.add('appear');
+		}, modalAnimation)
 
         // Focus on first input element
         if (obj.input.length > 0) {
@@ -129,29 +252,24 @@ $(function (){
 // Remove active modal when clicking outside modal
 window.addEventListener('load', () => {
 	document.body.addEventListener('click', (evt) => {
-		if (evt.target.className === "modal")
+		var remove = evt.target.classList.indexOf('modal') >= 0 || 
+					 evt.target.classList.indexOf('confirm') >= 0
+		if (remove)
 			document.body.removeChild(evt.target)
-	})
+	}, false)
+
+	// Remove active modals when pressing ESC
+	document.addEventListener('keydown', (evt) => {
+		if (evt.keyCode !== 27)
+			return
+
+		var modal = document.querySelector('.modal')
+		if (modal)
+			modal.parentNode.removeChild(modal)
+
+		var confirm = document.querySelector('.confirm')
+		if (confirm)
+			confirm.parentNode.removeChild(confirm)
+	}, false)
 }, false)
 
-// Remove confirmation pop up when clicking outside box
-window.addEventListener('load', () => {
-	document.body.addEventListener('click', (evt) => {
-		if (evt.target.className === "confirm")
-			document.body.removeChild(evt.target)
-	})
-}, false)
-	
-// Remove active modals when pressing ESC
-document.addEventListener('keydown', (evt) => {
-	if (evt.keyCode !== 27)
-		return
-
-	var modal = document.querySelector('.modal')
-	if (modal)
-		modal.parentNode.removeChild(modal)
-
-	var confirm = document.querySelector('.confirm')
-	if (confirm)
-		confirm.parentNode.removeChild(confirm)
-}, false)

@@ -38,7 +38,6 @@ $(document).ready(function() {
 
         var facet = evt.target.dataset.facet
         var entries = dataset.filter(entry => fitsCurrentClassification(entry))
-
         var done = function () {
             var remaining = entries.filter(entry => entry.taxonomy === undefined).length
             if (remaining !== 0) return
@@ -55,43 +54,9 @@ $(document).ready(function() {
                         unique.push(entity[j])
                 }
             }
-
-            var $modal = el("div").addClass("modal");
-            var $close = el("div").addClass("close-btn");
-            $close.on("click", function(evt) {
-                $(".modal").remove();
-            });
-
-            // remove if the user clicks outside the inspection view
-            $("body").on("click", function(evt) {
-               if (evt.target.className === "modal") {
-                    $(".modal").remove();
-                }
-            });
-
-            // remove modal view if escape key is pressed
-            $(document).keydown(function(e) {
-                if (e.keyCode === 27) {
-                    $(".modal").remove();
-                }
-            });
-
-            var $content = el("div");
-            $content.append($close);
-
-            $content.append(el("div").addClass("modal-entry-type").text("inspecting entities"));
-            $content.append(el("div").addClass("modal-entry-title").text(facet));
-            $content.append(el("div").addClass("modal-divider"));
-
-            for (var i = 0; i < unique.length; i++) {
-                var entity = el('div').text('- ' + unique[i])
-                $content.append(entity)
+            
+            window.modals.infoModal(facet,unique),function () {
             }
-
-            $content.append(el("div").addClass("modal-divider"));
-
-            $modal.append($content);
-            $("body").append($modal);
         }
 
         var update = function (entry) {
@@ -209,77 +174,23 @@ $(document).ready(function() {
     }
 
     function exportEntries(){
-        if (selectedEntries.length === 0) {
+        if (selectedEntries.length) {
             return
         }
 
-        function submitToCollection(cID) {
-            var url = window.api.host + "/v1/collection/" + cID + "/addEntry"
-            selectedEntries.forEach(eID => {
-                window.api.ajax("POST", url, {
-                    entryId: eID
-                })
-                $('input[type=checkbox]').prop('checked', false)
-            })
-            selectedEntries = []
-            $modal.remove()
-        }
-
-        function newCollection() {
-            window.api.ajax("POST", window.api.host + "/v1/collection/", {
-                name: $('.large-input').val()
-            }).done(res => {
-                var collectionId = res.id
-                submitToCollection(collectionId)
-            })
-        }
-
-        function existingCollection() {
-            submitToCollection($('#existing').val())
-        }
-
-        var $modal = el("div").addClass("modal")
-
-        $("body").on("click", function(evt) {
-           if (evt.target.className === "modal")
-                $(".modal").remove()
-        })
-
-        // remove modal view if escape key is pressed
-        // FIXME: This is registered globally, so they all accumulate
-        $(document).keydown(function(e) {
-            if (e.keyCode === 27) {
-                $(".modal").remove()
-            }
-        })
-
-        var $content = el("div")
-            .append(el("div").addClass("close-btn").click(() => $(".modal").remove()))
-            .append(el("div").addClass("modal-entry-type").text(`export entries (${selectedEntries.length})`))
-            .append(el("modal-entry-title").text("select collection"))
-            .append(el("div").addClass("modal-divider"))
-            .append(el("input").attr("type", "text").attr("placeholder", "new collection name").addClass('large-input'))
-            .append(el("button").addClass("edit-btn").text("create new").click(newCollection))
-            .append(el("div").addClass("modal-divider"))
-            .append(el("select").attr('id', 'existing').append(Object.keys(collections).map(
-                coll => el("option").val(collections[coll].id).text(collections[coll].name)
-            )))
-            .append(el("button").addClass("edit-btn").text("use existing").click(existingCollection))
-
-        $modal.append($content)
-        $("body").append($modal)
+        window.modals.exportModal(selectedEntries, collections)
+        selectedEntries = []
+        $('input[type=checkbox]').prop('checked', false)
     }
-
 
     // Append a select element if logged in so user can export to new/existing
     // collection/
     window.user.self().done(self => {
-        $('tr').append(el('th').text("export"))
+        $('tr').append(Element('th').text("export"))
 
         $('.table-view-area')
-        .append(el('button').addClass('edit-btn').text('export').click(exportEntries))
-        .append(el('button').addClass('edit-btn').text('select all').click(selectAllEntries))
-
+            .append(Element('button').addClass('edit-btn').text('export').click(exportEntries))
+            .append(Element('button').addClass('edit-btn').text('select all').click(selectAllEntries))
 
         loggedIn = true
     })
@@ -434,19 +345,19 @@ $(document).ready(function() {
     }
 
     function createOverviewTags(entry) {
-        var $entryTags = el("div").addClass("entry-tags");
+        var $entryTags = Element("div").addClass("entry-tags");
 
         if (filterIsDefined()) {
             for (var subfacet in currentClassification) {
                 if (!currentClassification[subfacet] && entry.serpClassification[subfacet]) {
-                    var $tag = el("div").addClass("entry-tag").text(subfacet);
+                    var $tag = Element("div").addClass("entry-tag").text(subfacet);
                     $entryTags.append($tag);
                 }
             }
         } else {
             for (var subfacet in entry.serpClassification) {
                 if (entry.serpClassification[subfacet]) {
-                    var $tag = el("div").addClass("entry-tag").text(subfacet);
+                    var $tag = Element("div").addClass("entry-tag").text(subfacet);
                     $entryTags.append($tag);
                 }
             }
@@ -458,12 +369,12 @@ $(document).ready(function() {
         var classification = entry["serpClassification"];
 
         // created the individual html elements
-        var $overviewEntry = el("div").addClass("overview-entry");
-        var $entryType = el("div").addClass("entry-type").text(entry["entryType"]);
+        var $overviewEntry = Element("div").addClass("overview-entry");
+        var $entryType = Element("div").addClass("entry-type").text(entry["entryType"]);
 
 
         var entryTitleText = entry["description"] || entry["reference"] || entry["doi"];
-        var $entryTitle = el("div").addClass("entry-title").text(entryTitleText);
+        var $entryTitle = Element("div").addClass("entry-title").text(entryTitleText);
         $entryTitle.data("entry-number", dataset.indexOf(entry));
 
         var $entryTags = createOverviewTags(entry);
@@ -474,23 +385,19 @@ $(document).ready(function() {
         $overviewEntry.append($entryTags);
         // insert into the DOM
         $(".overview-area").append($overviewEntry);
+
         $(".entry-title").unbind("click").on("click", function(evt) {
             var entryNumber = $(this).data("entry-number");
-            var entry = dataset[entryNumber];
+            var id= dataset[entryNumber].id
 
-            if (entry.taxonomy) {
-                buildModalView(entry);
-                return
-            }
-
-            window.api.ajax("GET", window.api.host + "/v1/entry/" + entry.id + "/taxonomy")
-            .done(taxonomy => {
-                console.log(entry)
-                entry.taxonomy = taxonomy
-                buildModalView(entry)
-            })
-            .fail(reason => window.alert(reason))
-        });
+            window.user.getEntry(id).done(entry => {
+                window.user.getTaxonomyEntry(id).done(taxonomy => {
+                    window.modals.entryModal(entry, taxonomy),function () {
+                        }
+                })
+                .fail(reason => window.alert(reason))
+            }).fail(reason => window.alert(reason))
+        })
     }
 
     // creates a table row with the data contained in entry
@@ -498,7 +405,7 @@ $(document).ready(function() {
         var classification = entry["serpClassification"];
 
         // let's build the table row for this entry
-        var $row = el("tr");
+        var $row = Element("tr");
         var maxLength = 35;
         // choose as the row descriptor either the project name, description
         // (for challenges), or the reference (for research results)
@@ -506,7 +413,7 @@ $(document).ready(function() {
         entryTitle = entryTitle.length > maxLength ?
             entryTitle.substring(0, maxLength - 3) + "..." :
             entryTitle.substring(0, maxLength);
-        var titleCell = el("td").text(entryTitle || entry["description"] || entry["reference"]);
+        var titleCell = Element("td").text(entryTitle || entry["description"] || entry["reference"]);
         titleCell.data("entry-number", dataset.indexOf(entry));
 
         $row.append(titleCell);
@@ -532,7 +439,7 @@ $(document).ready(function() {
         createCell("other");
 
         if (loggedIn) {
-            var mark = el("input").attr("type", "checkbox").val(entry.id)
+            var mark = Element("input").attr("type", "checkbox").val(entry.id)
 
             if (selectedEntries.indexOf(entry.id) >= 0)
                 mark.attr('checked', 'checked')
@@ -561,22 +468,19 @@ $(document).ready(function() {
         // (a click initiates an entry inspection)
         $("td:first-child").unbind("click").on("click", function(evt) {
             var entryNumber = $(this).data("entry-number");
-            var entry = dataset[entryNumber];
-            if (entry.taxonomy) {
-                buildModalView(entry);
-                return
-            }
+            var id= dataset[entryNumber].id
 
-            window.api.ajax("GET", window.api.host + "/v1/entry/" + entry.id + "/taxonomy")
-            .done(taxonomy => {
-                entry.taxonomy = taxonomy
-                buildModalView(entry)
-            })
-            .fail(reason => window.alert(reason))
-        });
+            window.user.getEntry(id).done(entry => {
+                window.user.getTaxonomyEntry(id).done(taxonomy => {
+                    window.modals.entryModal(entry, taxonomy),function () {
+                        }
+                })
+                .fail(reason => window.alert(reason))
+            }).fail(reason => window.alert(reason))
+        })
 
         function createCell(subfacet, alternating) {
-            var $td = el("td");
+            var $td = Element("td");
             classification[subfacet] ? $td.addClass("filled-cell") : "";
             alternating ? $td.addClass("alternating-group") : "";
             $row.append($td);
@@ -589,130 +493,6 @@ $(document).ready(function() {
         return this.charAt(0).toUpperCase() + this.slice(1);
     }
 
-    function buildModalView(entry) {
-        var $modal = el("div").addClass("modal");
-        var $close = el("div").addClass("close-btn");
-        $close.on("click", function(evt) {
-            // remove the modal view
-            $(".modal").remove();
-        });
-
-        // remove if the user clicks outside the inspection view
-        $("body").on("click", function(evt) {
-           if (evt.target.className === "modal") {
-                $(".modal").remove();
-            }
-        });
-
-        // remove modal view if escape key is pressed
-        $(document).keydown(function(e) {
-            if (e.keyCode === 27) {
-                $(".modal").remove();
-            }
-        });
-
-        var $content = el("div");
-        // add close btn
-        $content.append($close);
-
-        // start filling the view with entry data
-        $content.append(el("div").addClass("modal-entry-type").text(entry["entryType"]));
-        var entryTitle = entry["collection"]  || entry["description"] || entry["references"];
-        $content.append(el("div").addClass("modal-entry-title").text(entryTitle));
-        $content.append(el("div").addClass("modal-divider"));
-
-        // populate the classification data
-        var classifications = entry.serpClassification;
-        var scope = ["planning", "design", "execution", "analysis"];
-        var effect = ["solving", "adapting", "assessing", "improving"];
-        var context = ["sut", "information", "people", "other"];
-
-        // map the data name shorthands to their actual names
-        var shorthandMap = {
-            "adapting": "Adapt testing",
-            "solving": "Solve new problem",
-            "assessing": "Assess testing",
-            "improving": "Improve testing",
-            "planning": "Test planning",
-            "design": "Test design",
-            "execution": "Test execution",
-            "analysis": "Test analysis",
-            "people": "People related constraints",
-            "information": "Availability of information",
-            "sut" : "Properties of SUT",
-            "other": "Other"
-        }
-
-        function handleFacetMatch(facetName, subfacet) {
-            if (!classifiedItems[facetName]) {
-                var $facet = el("div").addClass("modal-header-title").text(facetName.capitalize());
-                classifiedItems[facetName] = $facet;
-            }
-
-            var $subfacet = shorthandMap[subfacet]
-                ? el("div").addClass("modal-sub-sub-item").text(shorthandMap[subfacet])
-                : classifiedItems[facetName]
-
-            var subfacetList = entry.taxonomy[subfacet.toUpperCase()];
-            for (var i = 0; i < subfacetList.length; i++ ) {
-                var detailText = subfacetList[i]
-                var $subfacetDetail = el("div").addClass("modal-sub-sub-item").text(detailText);
-                $subfacet.append($subfacetDetail)
-            }
-            classifiedItems[facetName].append($subfacet);
-        }
-
-        var classifiedItems = {
-            scope: null,
-            effect: null,
-            context: null,
-            intervention: null
-        };
-        for (var subfacet in classifications) {
-            if (classifications[subfacet]) {
-                if (scope.indexOf(subfacet) >= 0) {
-                    handleFacetMatch("scope", subfacet);
-                } else if (effect.indexOf(subfacet) >= 0) {
-                    handleFacetMatch("effect", subfacet);
-                } else if (context.indexOf(subfacet) >= 0) {
-                    handleFacetMatch("context", subfacet);
-                } else if (subfacet === "intervention") {
-                    handleFacetMatch("intervention", subfacet)
-                } else {
-                    console.log("this shouldn't ever happen; inside buildModalView() " + subfacet);
-                }
-            }
-        }
-
-        for (var facet in classifiedItems) {
-            var $facet = classifiedItems[facet];
-            if ($facet) {
-                $content.append($facet);
-            }
-        }
-        $content.append(el("div").addClass("modal-divider"));
-
-        // deal with entry type specific information
-        if (entry["entryType"] === "challenge") {
-            $content.append(el("div").addClass("modal-header-title").text("Description"));
-            $content.append(el("div").addClass("modal-sub-item").text(entry["description"]));
-        } else {
-            $content.append(el("div").addClass("modal-header-title").text("References"));
-            $content.append(el("div").addClass("modal-sub-item").text(entry["reference"]));
-            $content.append(el("div").addClass("modal-header-title").text("DOI"));
-            $content.append(el("div").addClass("modal-sub-item").text(entry["doi"]));
-        }
-
-        var $editBtn = el("button").addClass("edit-btn").text("edit");
-        $editBtn.on("click", function(evt) {
-            $(".modal").remove();
-            window.location = "/submit.html?e=" + entry.id;
-        });
-        $content.append($editBtn);
-
-        $modal.append($content);
-        $("body").append($modal);
-    }
 });
 
 function newestComparator(a, b) {
@@ -729,6 +509,6 @@ function alphabeticalComparator(a, b) {
 
 // more efficient way of creating elements than purely using jquery;
 // basically an alias for document.createElement - returns a jquery element
-function el(elementType) {
+function Element(elementType) {
     return $(document.createElement(elementType));
 }

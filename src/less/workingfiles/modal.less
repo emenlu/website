@@ -6,12 +6,12 @@
     left: 0;
     right: 0;
     bottom: 0;
-    background: rgba(0,0,0,0.5);
+    background: rgba(0,0,0,0.6);
     z-index: 10000;
 
-    -webkit-transition: opacity 200ms ease-in;
-    -moz-transition: opacity 200ms ease-in;
-    transition: opacity 200ms ease-in;
+    -webkit-transition: all 200ms ease-in;
+    -moz-transition: all 200ms ease-in;
+    transition: all 200ms ease-in;
 
     // hide initially
     opacity: 1;
@@ -33,15 +33,31 @@
     padding-bottom: 70px;
     background-color: @bg-color;
     border-radius: 2px;
-    box-shadow: 0 1px 0 rgba(0,0,0,0.9);
+    box-shadow: 0 5px 15px rgba(0,0,0,0.5);
 
     overflow-y: scroll;
     overflow-x: hidden;
+    opacity:0;
+    transform:translateY(-200px);
+    -webkit-transition: all 200ms ease-in;
+    -moz-transition: all 200ms ease-in;
+    transition: all 200ms ease-in;
+}
+
+.modal.appear > div {
+  opacity:1;
+  transform:translateY(0);
 }
 
 .modal h2 {
     font-size: 36px;
     padding: 0 0 20px;
+}
+
+
+.modal-li{
+    list-style-type: none;
+    margin-left: .8rem;
 }
 
 // close modal button
@@ -82,6 +98,10 @@
 
 .close-btn:focus:after {
     color: (@off-white);
+}
+
+.modal-header-title{
+    font-size: 15pt;
 }
 
 .modal-entry-type {

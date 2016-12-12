@@ -1,5 +1,6 @@
 (function(scope) {
 
+
 	function makeEntry(entry) {
 		var entryId = String(entry.id)
 
@@ -18,96 +19,13 @@
 		return div
 	}
 
-    var reverseMap = {
-    	"adapting": "Effect",
-        "solving": "Effect",
-        "assessing": "Effect",
-        "improving": "Effect",
-        "planning": "Scope",
-        "design": "Scope",
-        "execution": "Scope",
-        "analysis": "Scope",
-        "people": "Context",
-        "information": "Context",
-        "sut" : "Context",
-        "other": "Context",
-        "intervention": "Intervention"
-    }
-    var shorthandMap = {
-        "adapting": "Adapt testing",
-        "solving": "Solve new problem",
-        "assessing": "Assess testing",
-        "improving": "Improve testing",
-        "planning": "Test planning",
-        "design": "Test design",
-        "execution": "Test execution",
-        "analysis": "Test analysis",
-        "people": "People related constraints",
-        "information": "Availability of information",
-        "sut" : "Properties of SUT",
-        "other": "Other"
-    }
-
-
-	function constructEntities(taxonomy, facet) {
-		var filtered = taxonomy[facet] || []
-
-		return filtered.map(sample => (
-			sample === "unspecified" ?
-				undefined : el('div.modal-sub-sub-item', [sample]))
-		)
-	}
-
-	function constructSubfacet(taxonomy, facet) {
-		if (shorthandMap[facet.toLowerCase()])
-			return el('div.modal-sub-sub-item', [
-				shorthandMap[facet.toLowerCase()],
-				constructEntities(taxonomy, facet)
-			])
-		else
-			return constructEntities(taxonomy, facet)
-	}
-
-	function constructFacet(taxonomy, name) {
-		var samples = Object.keys(taxonomy).filter(
-			facet => reverseMap[facet.toLowerCase()] === name
-		) || []
-
-		if (!samples.length) return undefined
-
-		return el("div.modal-header-title", [
-			name,
-			samples.map(facet => constructSubfacet(taxonomy, facet))
-		])
-	}
-
 	function inspectEntry(evt) {
 		var id = this.dataset.entryId
+		window.user.getEntry(id).done(entry => {
+			window.user.getTaxonomyEntry(id).done(taxonomy => {
+				window.modals.entryModal(entry, taxonomy),function () {
 
-		window.api.ajax("GET", window.api.host + "/v1/entry/" + id).done(entry => {
-			window.api.ajax("GET", window.api.host + "/v1/entry/" + id + "/taxonomy").done(taxonomy => {
-				var inspectModal = new window.modal(
-					[
-						el('div.modal-entry-type', [entry.type]),
-						el('div.modal-header-title', [`entry #${entry.id}`])
-					], [
-						constructFacet(taxonomy, "Intervention"),
-						constructFacet(taxonomy, "Effect"),
-						constructFacet(taxonomy, "Scope"),
-						constructFacet(taxonomy, "Context"),
-						el("div.modal-divider"),
-						entry.type === "challenge" ? [
-							el('div.modal-header-title', ['Description']),
-							el('div.modal-sub-item', [entry.description])
-						] : [
-							el('div.modal-header-title', ['References']),
-							el('div.modal-sub-item', [entry.reference]),
-							el('div.modal-header-title', ['DOI']),
-							el('div.modal-sub-item', [entry.doi])
-						]
-					]
-				)
-				inspectModal.show()
+					}
 			})
 		})
 	}

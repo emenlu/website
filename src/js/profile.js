@@ -62,15 +62,14 @@ $(function() {
         window.modals.optionsModal(newCollectionModal, function (name) {
             window.user.createCollection(name)
                 .done(ok => {
-                    document.body.removeChild(this.modal)
-                    window.user.self().done(update)
+                    // document.body.removeChild(this.modal)
+                    // window.user.self().done(update)
                 })
                 .fail(xhr => {
                     $('.modal-complaint').remove()
-                    var error = document.getElementById('cancel')
-                    error.parentNode.insertBefore(el('div.modal-complaint', [
-                    xhr.responseText ]), error.nextSibling)
-                    this.modal.toggleButtonState()
+                    // var error = document.getElementById('cancel')
+                    // error.parentNode.insertBefore(el('div.modal-complaint', [
+                    // xhr.responseText ]), error.nextSibling)
                 })
         })
     })
@@ -230,6 +229,7 @@ $(function() {
 
     function setup(self) {
         update(self)
+
         if (self.trust === "Admin") {
             var a = el('a.view-area-tab.unactive-tab', {href : "/users.html"}, ['users'])
             var b = el('a.view-area-tab.unactive-tab', {href : "/entries.html"}, ['pending entries'])
@@ -237,9 +237,8 @@ $(function() {
             div.insertBefore(a, div.lastChild)
             div.insertBefore(b, div.lastChild)
         }
-        window.user.friends(self.email).done(data =>{
-          friends = data;
-        })
+
+        window.user.friends(self.email).done(data => friends = data)
     }
 
 })
