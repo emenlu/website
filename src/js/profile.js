@@ -152,12 +152,10 @@ $(function() {
             })
         })
 
-        $("#input0").autocomplete({
-          source: friends,
-          appendTo: "#modal"
+        document.getElementById("input0").autocomplete({
+            source: friends,
+            appendTo: "#modal"
         });
-
-        document.querySelector('#input0').focus()
     }
 
     function submit(evt) {
