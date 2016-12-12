@@ -179,20 +179,17 @@ $(function() {
         var parent = this.parentNode.parentNode.parentNode
         var id = parent.dataset.collectionId
         var name = parent.querySelector('.collection-title').textContent
-      //  alert("this is right button");
         var send = el('button.btn', ['send'])
 
         var cancel = el('button.btn', ['cancel'])
         var modal = el('div.modal', [el('div#modal', [
             el("div.modal-entry-type", [String(name)]),
             el("div.modal-header-title", ["send invite"]),
-            //el("class","ui-front"),
             el("div.modal-divider"),
             el('input#email.submit-input-box', {
                 placeholder : 'user email',
                 type : 'email',
                 name : 'email'
-              //  id: "test"
             }),
             el("div.modal-divider"),
             send, cancel
