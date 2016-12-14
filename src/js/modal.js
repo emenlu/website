@@ -17,8 +17,8 @@ $(document).ready(function() {
  //        // Create a new collection
 
     function findModal(node) {
-        if (node.classList.indexOf('modal') >= 0 || 
-            node.classList.indexOf('confirm') >= 0)
+        if (node.classList.contains('modal') || 
+            node.classList.contains('confirm'))
             return node
         else
             return findModal(node.parentNode)
@@ -252,8 +252,8 @@ $(document).ready(function() {
 // Remove active modal when clicking outside modal
 window.addEventListener('load', () => {
 	document.body.addEventListener('click', (evt) => {
-		var remove = evt.target.classList.indexOf('modal') >= 0 || 
-					 evt.target.classList.indexOf('confirm') >= 0
+		var remove = evt.target.classList.contains('modal') || 
+					 evt.target.classList.contains('confirm')
 		if (remove)
 			document.body.removeChild(evt.target)
 	}, false)
