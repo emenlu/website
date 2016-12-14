@@ -46,9 +46,10 @@ if ("development" === env) {
 // local file system. since we want jade templates to be loaded, force
 // browser to load the them instead. by redirection...
 app.use(function(req, res, next) {
-    if (req.path.indexOf('.html') >= 0)
-        res.redirect(req.path.replace('.html', ''))
-    else
+    if (req.path.indexOf('.html') >= 0) {
+        var query = Object.keys(req.query).map(k => k + "=" + req.query[k]).join('&')
+        res.redirect(req.path.replace('.html', '') + "?" + query)
+    } else
         next()
 })
 
