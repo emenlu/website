@@ -268,8 +268,10 @@ td {
 #queue-table {
     font-size: 10pt;
     border-collapse: collapse;
-    cellpadding: 0;
-    cellspacing: 0;
+    
+    & th {
+        border: none;
+    }
 }
 
 .queue-area {
@@ -289,37 +291,36 @@ td {
     width: 22%;
 }
 
-td:first-child {
-    overflow: hidden;
-    white-space: nowrap;
-    text-overflow: ellipsis;
+td {
+    &:first-child {
+        overflow: hidden;
+        white-space: nowrap;
+        text-overflow: ellipsis;
 
-    border-right: none;
-    border-bottom: none;
+        border-right: none;
+        border-bottom: none;
 
-    cursor: pointer;
+        cursor: pointer;
 
-    -webkit-transition: color 0.3s ease;
-    -moz-transition: color 0.3s ease;
-    -o-transition: color 0.3s ease;
-    -ms-transition: color 0.3s ease;
-    transition: color 0.3s ease;
-    &:hover {
-        color: @light-gray;
         -webkit-transition: color 0.3s ease;
         -moz-transition: color 0.3s ease;
         -o-transition: color 0.3s ease;
         -ms-transition: color 0.3s ease;
         transition: color 0.3s ease;
+
+        &:hover {
+            color: @light-gray;
+            -webkit-transition: color 0.3s ease;
+            -moz-transition: color 0.3s ease;
+            -o-transition: color 0.3s ease;
+            -ms-transition: color 0.3s ease;
+            transition: color 0.3s ease;
+        }
     }
-}
 
-#queue-table th:first-child {
-    border: none;
-}
-
-td:last-child, th:last-child {
-    border-right: none;
+    &:last-child, :first-child {
+        border-right: none;
+    }
 }
 
 .filled-cell {
