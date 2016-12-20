@@ -521,30 +521,9 @@ $(document).ready(function() {
                 input: ok.entries
             };
             window.modals.listModal(deleteAccountModal,function (args) {
-                console.log("args: " + args);
                 window.api.ajax("GET", window.api.host + "/v1/entry/"+args).done(ok=>{
-                    switch(ok.type){
-                        case "research":
-                            reference.value = ok.reference;
-                            doi.value = ok.doi;
-                            description.value = null;
-                            $("#research-button").prop("checked",true).trigger("click");
-                            $("#description-area").hide();
-                            $("#reference-area").show();
-                            $("#doi-area").show();
-                            break;
-                        case "challenge":
-                            reference.value = null;
-                            doi.value = null;
-                            description.value = ok.description;
-                            $("#challenge-button").prop("checked",true).trigger("click");
-                            $("#reference-area").hide();
-                            $("#doi-area").hide();
-                            $("#description-area").show();
-                            break;
-                        default:
-                            break;
-                    }
+                      $("#" + ok.type + "-button").trigger("click");
+                      fillAccordingToEntry(ok,true);
                 })
             })
         })
