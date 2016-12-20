@@ -57,6 +57,7 @@ $(function (){
 	        }
 	 }
 
+	 //adds entries to a modal and returns the id of the entry that got clicked
 	 modals.listModal = function(obj, method) {
 
  	        var parameters =[]
@@ -66,45 +67,20 @@ $(function (){
  	        // The X in the top-right corner
 
 					var i=0;
-					obj.input.forEach(entry=>{
-						//alert(entry);
-						var elEntry =
-						[el('div.collection-option', {
- 		                name: entry,
-										text: entry
-							//			onClick: function testerMAN(){	alert("hello");}
- 	        		})];
+					obj.input.forEach(entry => {;
+							var elEntry = el('div.modal-option-li', {
+								'data-entry-id': entry.id
+							}, [entry.description || entry.reference || entry.DOI])
 
-							elEntry.addEventListener('click', inspectEntry, false)
-							options[i] = elEntry;
+							elEntry.addEventListener('click', (evt) => {
+									var args=[];
+									args[0]=entry.id;
+									document.body.removeChild(modal)
+								method.apply({modal}, args)
+		 	        });
+							options[i]=elEntry;
 							i++;
-					})
-
-
-
- 	      /*  for(i=0;i<obj.input.length;i++){
- 	    			options[i] =
- 	    			[el("text#"+"input"+i+".modal-option-li", {
- 		                name: obj.input[i],
-										text: obj.input[i],
-										onClick: function testerMAN(){	alert("hello");}
- 	        		})];*/
-
-					/*		options[i].addEventListener('click',(evt)=>{
-								//alert("clicked on: " + obj.input[i]);
-								//document.body.removeChild(modal);
-							},false);
- 	    		}*/
-					//todo apply this ontop /\
-			/*		entries.forEach(entry => {
-						var elEntry = el('div.collection-option', {
-							'data-entry-id': entry.id
-						}, [entry.description || entry.reference || entry.DOI])
-
-						elEntry.addEventListener('click', inspectEntry, false)*/
-
- 	        var button1 = el('button.btn', [obj.btnText])
- 	        //creates optional button
+					});
  	        var cancel = el('button#cancel.btn', ['cancel'])
  	          //cancel button is a standard feature
  	        var modal = el('div.modal', [el('div', [
@@ -117,23 +93,11 @@ $(function (){
  		        options,
 
  	            el("div#bottom-divider.modal-divider"),
- 	            button1, cancel
+ 	            cancel
  	        ]) ])
-
  	        cancel.addEventListener('click', (evt) => {
  	            document.body.removeChild(modal)
  	        }, false)
-
- 	        button1.addEventListener('click', (evt) => {
- 		      	var args = []
- 		      	for(i=0;i<obj.input.length;i++){
- 		    			args[i] = $('#input'+i)[0].value
- 		    		}
- 		    	//maybe apply toggleButtonState()??
- 		      	method.apply({modal}, args)
- 		      	//put parameters into method
- 	        })
-
  	        function destroy() {
  				document.body.removeChild(modal)
  			}
@@ -155,13 +119,6 @@ $(function (){
  	        	focus()
  	        }
  	 }
-
-	 function inspectEntry(evt){
-		 alert("hello");
-	 }
-
-
-
 
 	modals.optionsModal = function(obj, method) {
 
