@@ -30,11 +30,17 @@ $(function (){
 		 });
 	}
 
+	user.friends = function(email){
+		return window.api.ajax("GET",window.api.host + "/v1/account/friends",{
+			email: email
+		});
+	}
+
 	user.collectionInvite = function(email,id){
 		return window.api.ajax("POST", window.api.host + "/v1/collection/" + id + "/invite", {
                 email: email
             });
-	}	
+	}
 
 	user.putIntoCollection = function(url,eID){
 		return window.api.ajax("POST", url, {entryId: eID })
@@ -92,7 +98,7 @@ $(function (){
 
 	user.getEntry = function (id){
 		return window.api.ajax("GET", window.api.host + "/v1/entry/" + id)
-	}		
+	}
 	user.getTaxonomyEntry = function (id){
 		return window.api.ajax("GET", window.api.host + "/v1/entry/" + id + "/taxonomy")
 	}

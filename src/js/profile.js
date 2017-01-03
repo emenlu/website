@@ -15,7 +15,7 @@ $(function() {
         }
     }
 
-    var deleteAccountModal = {  
+    var deleteAccountModal = {
         desc: "Delete Account",
         message: "This will delete your account, but your collections and entries will remain. Are you sure?",
         //message above input boxes
@@ -27,7 +27,7 @@ $(function() {
     };
 
     // Let user confirm account deletion before commencing orbital strike
-    $("#delete").click(evt => { 
+    $("#delete").click(evt => {
         window.modals.optionsModal(deleteAccountModal, function () {
             //A secondary box pops up to imply importance of the decision
             var message = "Delete Account - Are You Sure"
@@ -46,7 +46,7 @@ $(function() {
         })
     })
 
-    var newCollectionModal = {  
+    var newCollectionModal = {
         desc: "create new collection",
         message: "",
         //message above input boxes
@@ -56,7 +56,7 @@ $(function() {
         btnText: "Create"
         //text on button
     };
-    
+
     // Create a new collection
     $("#create").click(evt => {
         window.modals.optionsModal(newCollectionModal, function (name) {
@@ -75,7 +75,7 @@ $(function() {
     })
 
     // Change password dialog, must submit current and new passwords to api
-    var newPasswordModal = {  
+    var newPasswordModal = {
         desc: "Change your password",
         message: "",
         //message above input boxes
@@ -128,13 +128,13 @@ function invite(evt) {
         var id = parent.dataset.collectionId
         var name = parent.querySelector('.collection-title').textContent
 
-        var inviteUserModal = {  
+        var inviteUserModal = {
             desc: "Invite User to " + name,
             message: "",
             input: [['input0','email','user email']],
             btnText: "Invite"
             //text on button
-        }   
+        }
 
         window.modals.optionsModal(inviteUserModal,function (email) {
             window.user.collectionInvite(email,id)
@@ -151,7 +151,7 @@ function invite(evt) {
             })
         })
 
-        document.getElementById("input0").autocomplete({
+        $("#input0").autocomplete({
             source: friends,
             appendTo: "#modal"
         });
@@ -229,7 +229,6 @@ function invite(evt) {
 
     function setup(self) {
         update(self)
-
         if (self.trust === "Admin") {
             var a = el('a.view-area-tab.unactive-tab', {href : "/users.html"}, ['users'])
             var b = el('a.view-area-tab.unactive-tab', {href : "/entries.html"}, ['pending entries'])
@@ -237,7 +236,6 @@ function invite(evt) {
             div.insertBefore(a, div.lastChild)
             div.insertBefore(b, div.lastChild)
         }
-
         window.user.friends(self.email).done(data => friends = data)
     }
 
