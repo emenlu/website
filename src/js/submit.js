@@ -1,4 +1,14 @@
 $(document).ready(function() {
+
+    window.addEventListener("beforeunload", function (e) {
+      if(queuedEntries.length > 0){
+         var message = "You have unsaved entries queued.\n\n"
+            + "Do you still want to leave?";
+         e.returnValue = message;
+         return message;
+      }
+    });
+
     var querystring = {}
     // find a more permanent fix for this
     // without setTimeout the additional-data elements don't appear in firefox,
@@ -106,6 +116,7 @@ $(document).ready(function() {
 
     function submitEntry(entry) {
         var id = entry.id
+
         if (!id)
             return window.api.json("POST", window.api.host + "/v1/entry/new", entry)
 
@@ -238,7 +249,7 @@ $(document).ready(function() {
         // position + 2 rationale: nth-child(1) === table head
         // => we need to offset with 1
         // insert the updated row
-        if (position) {
+        if (position!=null) {
             $("#queue-table tr:nth-child(" + (position + 2 /* to account for table header */) + ")").replaceWith($row);
         } else {
             // append row to the end of the table
@@ -249,9 +260,11 @@ $(document).ready(function() {
         // this click initiates an inspection and possibly change of the entry
         // contents
         $("td:first-child").on("click", function(evt) {
+            $("td:first-child").removeClass("selected-entry-in-queue");
             var entryNumber = $(this).data("entry-number");
             $("#submit-btn").data("currentEntry", entryNumber);
             var entry = queuedEntries[entryNumber];
+            $(this).addClass("selected-entry-in-queue");
             discardEntryChanges();
             fillAccordingToEntry(entry);
         });
@@ -534,20 +547,28 @@ $(document).ready(function() {
         clearComplaints();
         // used as the queue button
         if ($thisEl.text() === "queue") {
-            var entry = getEntry();
-            if (entryIsValid(entry)) {
-                clearPageState();
-                queuedEntries.push(entry);
-                insertIntoTable(entry);
-                discardEntryChanges();
-            } else {
-                complain(entry);
-            }
+            pushEntry(getEntry());
         // used as the cancel button
         } else {
+            $("td:first-child").removeClass("selected-entry-in-queue");
             restoreButtons();
             discardEntryChanges();
         }
+    });
+
+    function pushEntry(entry){
+        if (entryIsValid(entry)) {
+          clearPageState();
+          queuedEntries.push(entry);
+          insertIntoTable(entry);
+          discardEntryChanges();
+        } else {
+            complain(entry);
+        }
+    }
+
+    $("#import-json-btn").on("click", function(evt) {
+        window.import.fromFile(pushEntry);
     });
 
     $("#remove-btn").on("click", function(evt) {

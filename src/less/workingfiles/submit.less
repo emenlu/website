@@ -4,14 +4,13 @@
     display: none;
 }
 //hides additional scroll bar
-.ui-menu::-webkit-scrollbar { 
-        display: none; 
+.ui-menu::-webkit-scrollbar {
+        display: none;
         z-index:1;
         position: relative;
         //not working for mozilla yet
-    }  
-//sets autocomplete pop out windows size and allows to scroll
-.ui-menu{ 
+    }
+.ui-menu{
      max-height: 190px; /*196px;*/
      overflow: scroll;
      width: -moz-min-content;/* Firefox */
@@ -157,9 +156,41 @@ input[type="radio"] {display:none;}
     text-align: right;
     width: 250px;
 }
+
+.import-file {
+    margin-left: 240px;
+    text-align: right;
+    width: 250px;
+}
+
+.import-heading {
+    vertical-align: top;
+    font-size: @facet-title-size;
+    display: inline-block;
+}
+
+.import-checkbox-heading {
+    vertical-align: top;
+    font-size: @facet-title-size;
+    color: red;
+    width: 115px;
+    display: inline-block;
+}
+
+.import-serp-select-complaint-wrapper {
+    display: flex;
+}
+
+.import-serp-select-wrapper {
+    display: flex;
+    justify-content: space-between;
+    width: 350px;
+}
+
 .queue-button-wrapper {
     margin-left: 83px;
 }
+
 .submit-input-box {
     font-family: "Open Sans";
     font-size: 12pt;
@@ -236,8 +267,10 @@ td {
 #queue-table {
     font-size: 10pt;
     border-collapse: collapse;
-    cellpadding: 0;
-    cellspacing: 0;
+
+    & th {
+        border: none;
+    }
 }
 
 .queue-area {
@@ -253,27 +286,26 @@ td {
     background-color: @super-light-gray;
 }
 
+.selected-entry-in-queue {
+    background-color: @super-light-gray;
+}
+
 #queue-table th:first-child {
     width: 22%;
 }
 
-td:first-child {
-    overflow: hidden;
-    white-space: nowrap;
-    text-overflow: ellipsis;
 
-    border-right: none;
-    border-bottom: none;
+td {
+    &:first-child {
+        overflow: hidden;
+        white-space: nowrap;
+        text-overflow: ellipsis;
 
-    cursor: pointer;
+        border-right: none;
+        border-bottom: none;
 
-    -webkit-transition: color 0.3s ease;
-    -moz-transition: color 0.3s ease;
-    -o-transition: color 0.3s ease;
-    -ms-transition: color 0.3s ease;
-    transition: color 0.3s ease;
-    &:hover {
-        color: @light-gray;
+        cursor: pointer;
+
         -webkit-transition: color 0.3s ease;
         -moz-transition: color 0.3s ease;
         -o-transition: color 0.3s ease;
@@ -286,9 +318,6 @@ td:first-child {
     border: none;
 }
 
-td:last-child, th:last-child {
-    border-right: none;
-}
 
 .filled-cell {
     background-color: @middling-gray;
@@ -312,7 +341,7 @@ th {
 }
 
 .additional-data-wrapper{
-    width: 12rem; /*220px;*/ 
+    width: 12rem; /*220px;*/
     padding-left:25%; /*37px;*/
 }
 .facet-additional-input {

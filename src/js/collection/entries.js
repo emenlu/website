@@ -29,7 +29,7 @@ $(function () {
 			elEntries.removeChild(elEntries.firstChild)
 
 		entries.forEach(entry => {
-			var elEntry = el('div.collection-option', {
+			var elEntry = el('div.collection-option-li', {
 				'data-entry-id': entry.id
 			}, [entry.description || entry.reference || entry.DOI])
 

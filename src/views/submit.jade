@@ -4,6 +4,7 @@ block view-specific-scripts
     script(src="js/util/el.js")
     script(src="js/modal.js")
     script(src="js/submit.js")
+    script(src="js/import.js")
 block content
     div.submit-view-area-wrapper
         div.form-content
@@ -38,7 +39,10 @@ block content
                 button#remove-btn.btn remove
                 button#queue-btn.btn queue
                 button#submit-btn.btn submit
-                  button#load-btn.btn load
+                button#load-btn.btn load
+            div.import-file
+                button#import-json-btn.btn Import
+                input#input_file(type='file', style='display:none', accept='.json,.csv')
     div.divider-wrapper
         div.classification-divider
         div.divider-title Classification
@@ -189,6 +193,8 @@ people in the process.").submit-facet-title Context
         div.divider-title Queued submissions
         div.queued-divider
     div.queue-area
+        div.queue-button-wrapper
+            button#submit-queue-btn.btn submit queue
         div.queue-title-area
             div#toggle-queue.hide-queue hide table
             div#toggle-chevron.hide-chevron
@@ -209,5 +215,3 @@ people in the process.").submit-facet-title Context
                     th SUT
                     th other
             tbody
-        div.queue-button-wrapper
-            button#submit-queue-btn.btn submit queue
