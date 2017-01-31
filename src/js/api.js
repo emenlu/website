@@ -116,9 +116,11 @@ $(function () {
 		});
 	}
 
-	v1.collection.invite = function(email, id){
+	v1.collection.invite = function(email, id,emailofinviter){
 	    return ajax("POST", endpoint("/v1/collection/" + id + "/invite"), {
-            email: email
+            email: email,
+						inviterEmail: emailofinviter
+
 		});
 	}
 
@@ -127,11 +129,11 @@ $(function () {
 	}
 
 	v1.collection.addEntry = function(cid, eid){
-		return ajax("POST", endpoint("/v1/collection/" + cid + "/addEntry"), { 
-			entryId: eid 
+		return ajax("POST", endpoint("/v1/collection/" + cid + "/addEntry"), {
+			entryId: eid
 		})
 	}
-	
+
 	v1.collection.stats = function(id){
 		return ajax("GET", endpoint("/v1/collection/" + id + "/stats"))
 	}
@@ -166,7 +168,7 @@ $(function () {
         return ajax("GET", endpoint(`/v1/entry/${id}/taxonomy`))
     }
 
-	// Root API 
+	// Root API
 	v1.getEntry = function (id){
 		return ajax("GET", endpoint("/v1/entry/") + id)
 	}
@@ -174,5 +176,5 @@ $(function () {
 	v1.getTaxonomyEntry = function (id){
 		return ajax("GET", endpoint("/v1/entry/" + id + "/taxonomy"))
 	}
-	
+
 })
