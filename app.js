@@ -65,6 +65,10 @@ app.get("/profile", function(req, res) {
     res.render("profile");
 });
 
+app.get("/taxonomy", function(req, res) {
+    res.render("taxonomy");
+});
+
 app.get("/invitations", function(req, res) {
     res.render("invitations");
 });
