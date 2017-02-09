@@ -6,7 +6,7 @@
         this.short = short
         this.long = long
         this.tree = children
-	}
+    }
     Node.prototype.name = function() { return this.long }
     Node.prototype.id = function() { return this.short }
     /**
@@ -88,30 +88,30 @@
      * }
      */
     // identifier, name, children
-	var MOCK_TAXONOMY = new Node("root", "root", [
-		new Node("effect", "Effect", [
-			new Node("testing-adapt", "Adapt testing", [
+    var MOCK_TAXONOMY = new Node("root", "root", [
+        new Node("effect", "Effect", [
+            new Node("testing-adapt", "Adapt testing", [
                 new Node("adapting", "Adapting for new tests", []),
                 new Node("adaptation", "Adaption for other shit", [])
             ]),
-			new Node("solving", "Solve new problem", []),
-			new Node("assessing", "Assess new problem", []),
-			new Node("improving", "Improve testing", [])
-		]),
-		new Node("scope", "Scope", [
-			new Node("planning", "Test planning", []),
-			new Node("design", "Test design", []),
-			new Node("execution", "Test execution", []),
-			new Node("analysis", "Test analysis", [])
-		]),
-		new Node("context", "Context", [
-			new Node("people", "People related constraints", []),
-			new Node("information", "Availability of information", []),
-			new Node("sut", "Properties of SUT", []),
-			new Node("other", "Other", [])
-		]),
-		new Node("intervention", "Intervention", [])
-	])
+            new Node("solving", "Solve new problem", []),
+            new Node("assessing", "Assess new problem", []),
+            new Node("improving", "Improve testing", [])
+        ]),
+        new Node("scope", "Scope", [
+            new Node("planning", "Test planning", []),
+            new Node("design", "Test design", []),
+            new Node("execution", "Test execution", []),
+            new Node("analysis", "Test analysis", [])
+        ]),
+        new Node("context", "Context", [
+            new Node("people", "People related constraints", []),
+            new Node("information", "Availability of information", []),
+            new Node("sut", "Properties of SUT", []),
+            new Node("other", "Other", [])
+        ]),
+        new Node("intervention", "Intervention", [])
+    ])
 
     /**
      * A tree representation of a taxonomy.
@@ -125,7 +125,7 @@
 
         /* e.g. backend_repr is a flat list of the nodes:
           [ node, node, node, node ]
-          where node = { short, long, parse }
+          where node = { short, long, parent }
 
           var root = node("root", "root", [])
           // extremely simple algo: build tree iteratively
