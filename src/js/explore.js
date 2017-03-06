@@ -16,13 +16,16 @@
 	}
 
 	var instance = undefined,
-		ctrl = undefined,
-		list = undefined
+		 ctrl = undefined,
+		 list = undefined
+
 	function explore(dataset, into) {
 		var graph = window.graph(dataset, window.explore_conf)
+
 		if (instance) {
 			list.changeDataset(dataset)
 			instance.graph.clear()
+
 			instance.graph.read(graph)
 			ctrl.reset()
 			instance.refresh()
@@ -46,19 +49,51 @@
 			ctrl = new window.controls(instance)
 			list = new window.listing($$('#listing'), instance, dataset)
 			list.registerEvents(ctrl)
+			
+			$$('#listing').addEventListener("mouseover", function(evt){
+				var entryId = evt.target.dataset.entryId
+				
+				if (!entryId) return
+
+				var filters = ctrl.activeFilters()
+				if (!filters.length) return
+
+				var edges = instance.graph.edges()
+				var filterNode = ctrl._node
+
+				for (var i = 0; i < edges.length; i++) {
+					var edge = edges[i]
+
+					if (filterNode && edge.source === filterNode.id) {
+						continue
+					} else if (String(edge.source) !== String(entryId)) {
+						edge.highlight = false
+					} else if (filters.indexOf(edge.target) === -1) {
+						edge.highlight = false
+					} else {
+						edge.highlight = true
+					}
+				}
+				
+				instance.refresh({skipIndexation: true})
+			}, false)
 
 			$$('#matches').addEventListener('click', () => {
 				var showView = $$('#matches').classList.contains('down')
+				
+				// Show labels in graph when matches view is visible 
 				instance.graph.nodes().forEach(n => {
 					if (n.category !== CATEGORY_FACET)
 						n.showLabel = showView
 				})
+
 				if (showView)
 					into.style.width = '75%'
 				else
 					into.style.width = '100%'
+				
 				instance.renderers[0].resize()
-				instance.refresh()
+				instance.refresh({skipIndexation: true})
 			}, false)
 		}
 	}
