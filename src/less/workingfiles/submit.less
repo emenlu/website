@@ -215,14 +215,6 @@ input[type="radio"] {display:none;}
     }
 }
 
-td {
-    text-align: center;
-    border-right: 1px solid @table-white;
-    border-bottom: 1px solid @table-white;
-    padding: 0;
-    margin: 0;
-}
-
 #queue-table {
     margin: 0 auto;
     font-size: 10pt;
@@ -242,36 +234,35 @@ td {
     display: inline-block;
 }
 
-.alternating-group {
-    background-color: @super-light-gray;
-}
-
 .selected-entry-in-queue {
     background-color: @super-light-gray;
 }
 
+.alternating-group {
+    background-color: @super-light-gray;
+}
 
 #queue-table th:first-child {
 
 }
 
-div .table-cell-div{
-    overflow: scroll;
+div .table-cell-div {
+    overflow-y: auto;
     max-height: 7rem;
-    padding-right:2rem;
-    width: 15.5rem;
 }// sets height of first cell of queue table
 
-.scroll-wrapper{ //wraps ^div so that scroll bar is hidden but table cell is scrollable
-    width: 16rem;
+.scroll-wrapper{ 
+    max-width: 16rem;
     overflow: hidden;
 }
-  
 
 td {
+    text-align: center;
+    padding: 0;
+    margin: 0;
+
     &:first-child {
         max-width: 150px;
-        width: 25%;
         z-index: 1;
         border-right: none;
         border-bottom: none;
@@ -283,6 +274,10 @@ td {
         -o-transition: color 0.3s ease;
         -ms-transition: color 0.3s ease;
         transition: color 0.3s ease;
+
+        &:hover {
+            color: @light-gray - #333;
+        }
     }
 }
 
@@ -295,11 +290,27 @@ td {
     background-color: @middling-gray;
 }
 
-th {
-    border-right: 1px solid white;
-    border-bottom: 1px solid white;
-    padding-right: 13px;
-    padding-left: 10px;
+#queue-table {
+    th {
+        padding-right: 10px;
+        padding-left: 10px;
+        
+        &.rotate { 
+            height: 100px; 
+            > div {
+                transform: 
+                    /* Magic Numbers */
+                    translate(5px, 25px)
+                    /* 45 incline = 360 - 45 */
+                    rotate(315deg);
+                width: 30px;
+            }    
+            > div > span {
+                border-bottom: 1px solid #ccc;
+                padding: 5px 10px;
+            }
+        }
+    }
 }
 
 .additional-data {
