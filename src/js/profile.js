@@ -1,7 +1,7 @@
 $(function() {
     //stores friends emails of the logged in user
     var friends = [];
-
+    var useremail;
     /* Add red text after the cancel button on a modal */
     function complain(text) {
         $('.modal-complaint').remove()
@@ -17,7 +17,7 @@ $(function() {
         api.v1.account.self().done(update)
     }
 
-    var deleteAccountModal = {  
+    var deleteAccountModal = {
         desc: "Delete Account",
         message: "This will delete your account, but your collections and entries will remain. Are you sure?",
         input: [],
@@ -25,7 +25,7 @@ $(function() {
     };
 
     // Let user confirm account deletion before commencing orbital strike
-    $("#delete").click(evt => { 
+    $("#delete").click(evt => {
         window.modals.optionsModal(deleteAccountModal, function () {
             //A secondary box pops up to imply importance of the decision
             var message = "Delete Account - Are You Sure"
@@ -37,13 +37,13 @@ $(function() {
         })
     })
 
-    var newCollectionModal = {  
+    var newCollectionModal = {
         desc: "create new collection",
         message: "",
         input: [['input0','text','collection name']],
         btnText: "Create"
     };
-    
+
     // Create a new collection
     $("#create").click(evt => {
         window.modals.optionsModal(newCollectionModal, function (name) {
@@ -54,7 +54,7 @@ $(function() {
     })
 
     // Change password dialog, must submit current and new passwords to api
-    var newPasswordModal = {  
+    var newPasswordModal = {
         desc: "Change your password",
         message: "",
         input: [['input0','password','old password'], ['input1','password','new password']],
@@ -74,17 +74,18 @@ $(function() {
         var id = parent.dataset.collectionId
         var name = parent.querySelector('.collection-title').textContent
 
-        var inviteUserModal = {  
+        var inviteUserModal = {
             desc: "Invite User to " + name,
             message: "",
             input: [['input0','email','user email']],
             btnText: "Invite"
-        }   
+        }
 
         window.modals.optionsModal(inviteUserModal,function (email) {
-            api.v1.collection.invite(email, id)
-                .done(ok => cleanup(this.modal))
-                .fail(xhr => complain(xhr.responseText))
+          api.v1.collection.invite(email, id,useremail)
+              .done(ok => cleanup(this.modal))
+              .fail(xhr => complain(xhr.responseText))
+
         })
 
         new Awesomplete('#input0', { 
@@ -149,12 +150,13 @@ $(function() {
                 ])
             ])
 		])
-        
+
 		obj.dataset.collectionId = coll.id
     	document.querySelector(".profile-content").appendChild(obj)
     }
 
     function update(self) {
+        useremail = self.email;
         $(".user-email").text(`${self.email} (${self.trust})`)
         $("div.collection-wrapper").remove()
 
