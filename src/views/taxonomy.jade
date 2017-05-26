@@ -1,0 +1,14 @@
+extends base
+block view-specific-scripts
+    link(rel='stylesheet', href='/css/taxonomy.css')
+
+    // app
+    script(src="js/util/el.js")
+    script(src="js/taxonomy.js")
+    script(src="js/tax-playground.js")
+
+block content
+    h1 taxonomy playground
+    select#collection
+    select#entry
+    div#taxonomy
