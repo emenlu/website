@@ -9,6 +9,10 @@ block view-specific-scripts
 block content
     div.submit-view-area-wrapper
         div#submit-form.form-content
+            div.divider-wrapper
+                div.classification-divider
+                div.divider-title Entry Info
+                div.classification-divider
             div.entry-type-area
                 div.submit-row-heading Entry type
                 div.entry-type-wrapper
@@ -44,164 +48,165 @@ block content
             div.import-file
                 button#import-json-btn.btn Import
                 input#input_file(type='file', style='display:none', accept='.json,.csv')
-    div.divider-wrapper
-        div.classification-divider
-        div.divider-title Classification
-        div.classification-divider
     div.submit-facets
-        div(alt="an act performed (e.g. use of a technique or a process change) \
-        to adapt testing to a specific context, to solve a test issue, to \
-assess testing or to improve testing" title="an act performed (e.g. use \
-of a technique or a process change) to adapt testing to a specific \
-context, to solve a test issue, to assess testing or to improve \
-testing").submit-facet-title Intervention
-            // div.additional-data click to add an intervention under study +
-            label(for="checkbox").sub-facet
-                label.checkbox
-                    input(name="intervention" type="checkbox")#intervention-box
-                    span
-                    h4.facet-classification Supply interventions
-        div(alt="An effect target entity is a short statement of what should be \
-achieved by an intervention. An effect entity is correspondingly a \
-statement of a measured effect. An effect(-target) entity may be \
-classified as either solving, adapting, assessing or improving testing. \
-This classification is relative to the context of its associated \
-research result or practical challenge." title="An effect target entity \
-is a short statement of what should be achieved by an intervention. An \
-effect entity is correspondingly a statement of a measured effect. An \
-effect(-target) entity may be classified as either solving, adapting, \
-assessing or improving testing. This classification is relative to the \
-context of its associated research result or practical challenge.").submit-facet-title Effect
-            label(for="checkbox" alt="Solving: The focus of the challenge description or \
-research result is on novelty. This means that it does not consider \
-any benchmark with which to compare the effects of an intervention. \
-Novelty relates to the testing rather than the testing context. \
-Furthermore, the focus is on solving a problem rather than \
-assessing the situation." title="Solving: The focus of the challenge \
-description or research result is on novelty. This means that it \
-does not consider any benchmark with which to compare the effects \
-of an intervention. Novelty relates to the testing rather than the \
-testing context. Furthermore, the focus is on solving a problem \
-rather than assessing the situation.").sub-facet 
-                label.checkbox 
-                    input(name="solving" type="checkbox")#solving-box
-                    span
-                    h4.facet-classification Solve new problem
-            label(alt="Adapting: The focus of the challenge description or \
-research result is on the characteristics of the testing context. \
-Like the solving category no benchmark is considered." title="\
-Adapting: The focus of the challenge description or research result \
-is on the characteristics of the testing context. Like the solving \
-category no benchmark is considered." for="checkbox").sub-facet
-                label.checkbox
-                    input(name="adapting" type="checkbox")#adapting-box
-                    span
-                    h4.facet-classification Adapt testing
-            label(alt="Assessing: The focus of the challenge description or \
-research result is on how to assess testing (rather than solving a \
-problem) to identify points of improvement." title="Assessing: The \
-focus of the challenge description or research result is on how to \
-assess testing (rather than solving a problem) to identify points \
-of improvement." for="checkbox").sub-facet 
-                label.checkbox
-                    input(name="assessing" type="checkbox")#assessing-box
-                    span
-                    h4.facet-classification Assess testing
-            label(alt="Improving: The focus of the challenge description is on \
-the change or correspondingly for a research result focus is on the \
-comparison of interventions. In both cases benchmarks are \
-expected." title="Improving: The focus of the challenge \
-description is on the change or correspondingly for a research \
-result focus is on the comparison of interventions. In both cases \
-benchmarks are expected." for="checkbox").sub-facet 
-                label.checkbox
-                    input(name="improving" type="checkbox")#improving-box
-                    span
-                    h4.facet-classification Improve testing
-        div(alt="The scope of a testing intervention describes the extent of \
-the effect, intended or measured, on the test process. Correspondingly \
-the scope of the challenge describes which part of the testing process \
-is primarily affected by the challenge or desired improvement. The \
-scope may be expressed in terms of one or more tasks or activities \
-(scope entities), which may be classified as being part of either \
-planning, design, execution or analysis." title="The scope of a testing \
-intervention describes the extent of the effect, intended or measured, \
-on the test process. Correspondingly the scope of the challenge \
-describes which part of the testing process is primarily affected by \
-the challenge or desired improvement. The scope may be expressed in \
-terms of one or more tasks or activities (scope entities), which may be \
-classified as being part of either planning, design, execution or \
-analysis.").submit-facet-title Scope
-            label(alt="Planning: Test planning refers to decisions on the \
-testing and how to achieve the testing goal." title="Planning: Test \
-planning refers to decisions on the testing and how to achieve the \
-testing goal." for="checkbox").sub-facet 
-                label.checkbox
-                    input(name="planning" type="checkbox")#planning-box
-                    span
-                    h4.facet-classification Test planning
-            label(alt="Design: Test design refers to the activity of deriving \
-and creating test cases and test sets." title="Design: Test design \
-refers to the activity of deriving and creating test cases and test \
-sets." for="checkbox").sub-facet 
-                label.checkbox
-                    input(name="design" type="checkbox")#design-box
-                    span
-                    h4.facet-classification Test design
-            label(alt="Execution: Test execution includes scripting, execution \
-and verdict reporting of a test case and a test set. " title="Execution: Test \
-execution includes scripting, execution and \
-verdict reporting of a test case and a test set." for="checkbox").sub-facet 
-                label.checkbox
-                    input(name="execution" type="checkbox")#execution-box
-                    span
-                    h4.facet-classification Test execution
-            label(alt="Analysis: Test analysis refers to the evaluation and \
-analysis of the test outcome with respect to some criteria." title="Analysis: \
-Test analysis refers to the evaluation and \
-analysis of the test outcome with respect to some criteria." for="checkbox").sub-facet 
-                label.checkbox
-                    input(name="analysis" type="checkbox")#analysis-box
-                    span
-                    h4.facet-classification Test analysis
-        div(alt="A context entity names a factor restricting the applicability of an \
-intervention. Similarly, from a problem \
-perspective, a context entity names a factor that delimits the \
-selection of possible interventions. However, when \
-classifying empirical evaluations of interventions the context entities \
-should name the factors that have actually been considered in \
-that specific study. Context-entities may be classified as being \
-related to either the SUT, the availability of information or the \
-people in the process." title="A context entity names a factor restricting \
-the applicability of an \
-intervention. Similarly, from a problem \
-perspective, a context entity names a factor that delimits the \
-selection of possible interventions. However, when \
-classifying empirical evaluations of interventions the context entities \
-should name the factors that have actually been considered in \
-that specific study. Context-entities may be classified as being \
-related to either the SUT, the availability of information or the \
-people in the process.").submit-facet-title Context
-            label(for="checkbox").sub-facet
-                label.checkbox
-                    input(name="people" type="checkbox")#people-box
-                    span 
-                    h4.facet-classification People related constraints
-            label(for="checkbox").sub-facet 
-                label.checkbox
-                    input(name="information" type="checkbox")#information-box
-                    span
-                    h4.facet-classification Availability of information  
-            label(for="checkbox").sub-facet 
-                label.checkbox
-                    input(name="sut" type="checkbox")#sut-box
-                    span
-                    h4.facet-classification Properties of SUT
-            label(for="checkbox").sub-facet 
-                label.checkbox
-                    input(name="other" type="checkbox")#other-box
-                    span
-                    h4.facet-classification Other  
+        div.divider-wrapper
+            div.classification-divider
+            div.divider-title Classification
+            div.classification-divider
+        div.classification-wrapper
+            div(alt="an act performed (e.g. use of a technique or a process change) \
+            to adapt testing to a specific context, to solve a test issue, to \
+    assess testing or to improve testing" title="an act performed (e.g. use \
+    of a technique or a process change) to adapt testing to a specific \
+    context, to solve a test issue, to assess testing or to improve \
+    testing").submit-facet-title Intervention
+                // div.additional-data click to add an intervention under study +
+                label(for="checkbox").sub-facet
+                    label.checkbox
+                        input(name="intervention" type="checkbox")#intervention-box
+                        span
+                        h4.facet-classification Supply interventions
+            div(alt="An effect target entity is a short statement of what should be \
+    achieved by an intervention. An effect entity is correspondingly a \
+    statement of a measured effect. An effect(-target) entity may be \
+    classified as either solving, adapting, assessing or improving testing. \
+    This classification is relative to the context of its associated \
+    research result or practical challenge." title="An effect target entity \
+    is a short statement of what should be achieved by an intervention. An \
+    effect entity is correspondingly a statement of a measured effect. An \
+    effect(-target) entity may be classified as either solving, adapting, \
+    assessing or improving testing. This classification is relative to the \
+    context of its associated research result or practical challenge.").submit-facet-title Effect
+                label(for="checkbox" alt="Solving: The focus of the challenge description or \
+    research result is on novelty. This means that it does not consider \
+    any benchmark with which to compare the effects of an intervention. \
+    Novelty relates to the testing rather than the testing context. \
+    Furthermore, the focus is on solving a problem rather than \
+    assessing the situation." title="Solving: The focus of the challenge \
+    description or research result is on novelty. This means that it \
+    does not consider any benchmark with which to compare the effects \
+    of an intervention. Novelty relates to the testing rather than the \
+    testing context. Furthermore, the focus is on solving a problem \
+    rather than assessing the situation.").sub-facet 
+                    label.checkbox 
+                        input(name="solving" type="checkbox")#solving-box
+                        span
+                        h4.facet-classification Solve new problem
+                label(alt="Adapting: The focus of the challenge description or \
+    research result is on the characteristics of the testing context. \
+    Like the solving category no benchmark is considered." title="\
+    Adapting: The focus of the challenge description or research result \
+    is on the characteristics of the testing context. Like the solving \
+    category no benchmark is considered." for="checkbox").sub-facet
+                    label.checkbox
+                        input(name="adapting" type="checkbox")#adapting-box
+                        span
+                        h4.facet-classification Adapt testing
+                label(alt="Assessing: The focus of the challenge description or \
+    research result is on how to assess testing (rather than solving a \
+    problem) to identify points of improvement." title="Assessing: The \
+    focus of the challenge description or research result is on how to \
+    assess testing (rather than solving a problem) to identify points \
+    of improvement." for="checkbox").sub-facet 
+                    label.checkbox
+                        input(name="assessing" type="checkbox")#assessing-box
+                        span
+                        h4.facet-classification Assess testing
+                label(alt="Improving: The focus of the challenge description is on \
+    the change or correspondingly for a research result focus is on the \
+    comparison of interventions. In both cases benchmarks are \
+    expected." title="Improving: The focus of the challenge \
+    description is on the change or correspondingly for a research \
+    result focus is on the comparison of interventions. In both cases \
+    benchmarks are expected." for="checkbox").sub-facet 
+                    label.checkbox
+                        input(name="improving" type="checkbox")#improving-box
+                        span
+                        h4.facet-classification Improve testing
+            div(alt="The scope of a testing intervention describes the extent of \
+    the effect, intended or measured, on the test process. Correspondingly \
+    the scope of the challenge describes which part of the testing process \
+    is primarily affected by the challenge or desired improvement. The \
+    scope may be expressed in terms of one or more tasks or activities \
+    (scope entities), which may be classified as being part of either \
+    planning, design, execution or analysis." title="The scope of a testing \
+    intervention describes the extent of the effect, intended or measured, \
+    on the test process. Correspondingly the scope of the challenge \
+    describes which part of the testing process is primarily affected by \
+    the challenge or desired improvement. The scope may be expressed in \
+    terms of one or more tasks or activities (scope entities), which may be \
+    classified as being part of either planning, design, execution or \
+    analysis.").submit-facet-title Scope
+                label(alt="Planning: Test planning refers to decisions on the \
+    testing and how to achieve the testing goal." title="Planning: Test \
+    planning refers to decisions on the testing and how to achieve the \
+    testing goal." for="checkbox").sub-facet 
+                    label.checkbox
+                        input(name="planning" type="checkbox")#planning-box
+                        span
+                        h4.facet-classification Test planning
+                label(alt="Design: Test design refers to the activity of deriving \
+    and creating test cases and test sets." title="Design: Test design \
+    refers to the activity of deriving and creating test cases and test \
+    sets." for="checkbox").sub-facet 
+                    label.checkbox
+                        input(name="design" type="checkbox")#design-box
+                        span
+                        h4.facet-classification Test design
+                label(alt="Execution: Test execution includes scripting, execution \
+    and verdict reporting of a test case and a test set. " title="Execution: Test \
+    execution includes scripting, execution and \
+    verdict reporting of a test case and a test set." for="checkbox").sub-facet 
+                    label.checkbox
+                        input(name="execution" type="checkbox")#execution-box
+                        span
+                        h4.facet-classification Test execution
+                label(alt="Analysis: Test analysis refers to the evaluation and \
+    analysis of the test outcome with respect to some criteria." title="Analysis: \
+    Test analysis refers to the evaluation and \
+    analysis of the test outcome with respect to some criteria." for="checkbox").sub-facet 
+                    label.checkbox
+                        input(name="analysis" type="checkbox")#analysis-box
+                        span
+                        h4.facet-classification Test analysis
+            div(alt="A context entity names a factor restricting the applicability of an \
+    intervention. Similarly, from a problem \
+    perspective, a context entity names a factor that delimits the \
+    selection of possible interventions. However, when \
+    classifying empirical evaluations of interventions the context entities \
+    should name the factors that have actually been considered in \
+    that specific study. Context-entities may be classified as being \
+    related to either the SUT, the availability of information or the \
+    people in the process." title="A context entity names a factor restricting \
+    the applicability of an \
+    intervention. Similarly, from a problem \
+    perspective, a context entity names a factor that delimits the \
+    selection of possible interventions. However, when \
+    classifying empirical evaluations of interventions the context entities \
+    should name the factors that have actually been considered in \
+    that specific study. Context-entities may be classified as being \
+    related to either the SUT, the availability of information or the \
+    people in the process.").submit-facet-title Context
+                label(for="checkbox").sub-facet
+                    label.checkbox
+                        input(name="people" type="checkbox")#people-box
+                        span 
+                        h4.facet-classification People related constraints
+                label(for="checkbox").sub-facet 
+                    label.checkbox
+                        input(name="information" type="checkbox")#information-box
+                        span
+                        h4.facet-classification Availability of information  
+                label(for="checkbox").sub-facet 
+                    label.checkbox
+                        input(name="sut" type="checkbox")#sut-box
+                        span
+                        h4.facet-classification Properties of SUT
+                label(for="checkbox").sub-facet 
+                    label.checkbox
+                        input(name="other" type="checkbox")#other-box
+                        span
+                        h4.facet-classification Other  
     div.divider-wrapper
         div.classification-divider
         div.divider-title Queued submissions
