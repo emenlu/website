@@ -18,6 +18,10 @@
     overflow: hidden;
 }
 
+#doi-area {
+    clear: both;
+}
+
 #submit-form{
     margin-left: 6%;
 }
@@ -31,18 +35,32 @@
 }
 
 .submit-facets {
-    height:354px;
     justify-content:space-between;
     display:flex;
     flex-direction: column;
 }
 
 .classification-wrapper {
-    height: 292px;
-    justify-content: space-between;
+    margin-left: 10%;
     display: flex;
-    flex-direction: column;
+    flex-direction: row;
     flex-wrap: wrap;
+
+    > div {
+        flex: 1;
+    }
+}
+
+.class-wrapper-1 {
+    > div {
+        margin-left: 10%;
+    }
+}
+
+.class-wrapper-2 {
+    > div {
+        margin-left: 10%;
+    }
 }
 
 .submit-facet-title {
@@ -50,6 +68,7 @@
     vertical-align: top;
     font-size: @facet-title-size;
     margin-top: 10px;
+    margin-bottom: 20px;
     -webkit-transition: color 0.2s ease;
     -moz-transition: color 0.2s ease;
     -o-transition: color 0.2s ease;
@@ -104,26 +123,45 @@ input[type="radio"] {display:none;}
 }
 
 .optional {
-    margin-left: 5px;
+    margin-bottom: 5px;
+    margin-right: 7%;
     color: @light-gray;
     font-style: italic;
     display: inline-block;
 }
 .complaint {
     .optional();
-    position: absolute;
     vertical-align: top;
     color: @red;
+    float: right;
+}
+
+.button-row {
+    width: 100%;
+    display: block;
+
 }
 
 .button-wrapper {
-    margin-left: 240px;
-    text-align: right;
-    width: 250px;
+    display: flex;
+    position: relative;
+    float: right;
 }
 
 .button-wrapper > button {
     margin-left: 5px;
+    float: right;
+    display: block;
+}
+
+.submit-button {
+    clear: both;
+}
+
+.submit-button > button {
+    margin-left: 5px;
+    float: right;
+    display: block;
 }
 
 .import-file {
@@ -202,7 +240,7 @@ input.import-checkbox.extra[type=checkbox]:checked:before {
 
 .queue-button-wrapper {
     text-align: center;
-    padding: 20px;
+    padding-bottom: 20px;
 }
 
 .submit-input-box {
@@ -310,16 +348,30 @@ td {
 
 }
 
-div .table-cell-div{
+div.table-cell-div {
     overflow: scroll;
     max-height: 7rem;
     padding-right:2rem;
     width: 15.5rem;
+    border-left: 1px;
 }// sets height of first cell of queue table
 
 .scroll-wrapper{ //wraps ^div so that scroll bar is hidden but table cell is scrollable
     width: 16rem;
     overflow: hidden;
+    border-left-color: @super-light-gray;
+    border-left-width: 1px;
+    border-left-style: solid;
+
+    -webkit-transition: border-left-color 0.2s ease;
+    -moz-transition: border-left-color 0.2s ease;
+    -o-transition: border-left-color 0.2s ease;
+    -ms-transition: border-left-color 0.2s ease;
+    transition: border-left-color 0.2s ease;
+
+    &:hover {
+        border-left-color: @link-color;
+    }
 }
 
 
@@ -451,6 +503,7 @@ th {
     white-space: nowrap;
     display: flex;
     align-items:center;
+    clear: both;
 }
 
 .divider {

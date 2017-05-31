@@ -17,6 +17,7 @@ body {
 	float: right;
 
 	&.down {
+		border-radius: 5px;
 		border-top: inset 2px gray;
 		border-left: inset 2px gray;
 		border-right: inset 2px white;
@@ -24,19 +25,10 @@ body {
 	}
 }
 
-/* match view class appended on research entries */
-.res {
-	background-color: #FAB;
-}
-/* match view class appended on challenge entries */
-.chl {
-	background-color: #BAF;
-}
-.inc {
-	background-color: #AAA;
-}
-
 #helpbox {
+	> li {
+			list-style-type: disc;
+	}
 	display: none;
 	position: absolute;
 	z-index: 10;
@@ -80,6 +72,27 @@ body {
 		margin: 2px;
 		border-radius: 2px;
 	}
+}
+
+/* match view class appended on research entries */
+.res {
+	background-color: #FAB;
+}
+/* match view class appended on challenge entries */
+.chl {
+	background-color: #BAF;
+}
+.inc {
+	background-color: #AAA;
+}
+.effect {
+	background-color: #9ecae1;
+}
+.scope {
+	background-color: #a1d99b;
+}
+.context {
+	background-color: #fd8d3c;
 }
 
 .content {

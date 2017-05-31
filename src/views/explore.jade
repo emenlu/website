@@ -55,12 +55,18 @@ block content
 		div#graph
 		div#listing
 	span
-		select#dataset
-			option(value="main" selected) main
+		label.collection-dropdown-label
+			select#dataset
+				option(value="main" selected) main
 	span#legend
+		span entries: 
 		span.chl challenge
 		span.res research
 		span.inc incomplete
+		span    facets: 
+		span.effect effect
+		span.scope scope
+		span.context context
 	button#help.control-btn Tips
 	button#reset.control-btn Reset
 	button#matches.control-btn Matches
