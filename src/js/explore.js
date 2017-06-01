@@ -10,7 +10,7 @@
 				e.style.display = 'none'
 			else
 				e.style.display = 'block'
-			
+
 			this.classList.toggle('down')
 		}
 	}
@@ -134,6 +134,11 @@
 			$$('#listing').style.height = height
 		}
 
+		// automatically display matches when loading the page
+		$(function () {
+			$('#matches').click();
+		});
+
 	}
-	
+
 })();
