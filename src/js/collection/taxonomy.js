@@ -48,19 +48,16 @@ $(function () {
 
 	$("#profile").addClass("current-view");
 	Dataset.loadDefault(data => {
-		var baseSerp
-		var baseTaxonomyData
 		if (!cID) return
-		api.v1.taxonomy().then(serp => {
-			baseTaxonomyData = serp
-			baseSerp = serp
-		})
-		api.v1.collection.taxonomy(cID).then(serpExt => {
-			extendedTaxonomyData = serpExt
-			var taxonomyData = [baseTaxonomyData,extendedTaxonomyData]
-			var taxonomy = new window.Taxonomy(baseSerp.taxonomy)
- 			taxonomy.extend(serpExt.taxonomy)
-			window.project.renderGraph('#taxonomy', data, taxonomy, taxonomy.root,taxonomyData)
+		Promise.all([
+			api.v1.taxonomy(),
+			api.v1.collection.taxonomy(cID)	
+		]).then(taxonomyData => {
+			var serp = taxonomyData[0]
+			var extension = taxonomyData[1]
+			var taxonomy = new window.Taxonomy(serp.taxonomy)
+ 			taxonomy.extend(extension.taxonomy)
+			window.project.renderGraph('#taxonomy', data, taxonomy, taxonomy.root, taxonomyData)
 		})
 	})
 })
