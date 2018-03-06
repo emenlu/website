@@ -187,8 +187,11 @@ $(function () {
         return ajax("GET", endpoint("/v1/collection/" + cID + "/classification"))
     }
 
-    v1.collection.taxonomy = function (cid) {
-        return ajax("GET", endpoint("/v1/collection/" + cid + "/taxonomy"))
+    v1.collection.taxonomy = function(cid, extension) {
+        if (extension)
+            return json("PUT", endpoint(`/v1/collection/${cid}/taxonomy`) , extension)
+        else
+            return ajax("GET", endpoint(`/v1/collection/${cid}/taxonomy`))
     }
 
     // Admin API

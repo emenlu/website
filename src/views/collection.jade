@@ -7,15 +7,23 @@ block view-specific-scripts
     script(src="js/components/fuzzy-kick-user-modal.js")
     script(src="js/components/leave-collection-modal.js")
     script(src="js/components/inspect-taxonomy-modal.js")
+    script(src="js/components/delete-collection-modal.js")
     script(src="js/modal.js")
     script(src="js/taxonomy.js")
     script(src="js/taxonomy-functionality.js")
     script(src="js/export.js")
 
+    script(src="js/info.js")
+    script(src="js/overview.js")
+    script(src="js/util/color.js")
+    script(src="js/util/usage.js")
+    script(src="js/util/treeify.js")
+    script(src="js/dataset.js")
 block content
     div.profile-area-wrapper
         a(href="/profile.html")#profile.view-area-tab.unactive-tab profile
         a(href="/collection.html")#general.view-area-tab.active-tab general
+        a(href="/collection/taxonomy.html")#taxonomy-tab.view-area-tab.unactive-tab taxonomy
         a(href="/collection/users.html")#users.view-area-tab.unactive-tab users
         a(href="/collection/entries.html")#entries.view-area-tab.unactive-tab entries
         div.profile-container
@@ -30,3 +38,17 @@ block content
                     button#export.btn export collection
                 div.collections-main-title statistics
                     p.collection-stats 0 entries, 0 members
+                div.overview-container
+                    div.ov-tax-container
+                        span#taxonomy
+                        div#taxonomyID.center 
+                    div.width-30.column-spaced
+                        div.overview-explanation
+                            div.explanation-container
+                                img(src="/img/mouse-over.png")#hand.square
+                                p#hover-facet-title  Hover over the table to see which facet you are currently viewing
+                            div.explanation-container
+                                a#square.square
+                                h3#facet-title Serp
+                            p#facet-explanation Click the tables on the left to get more information about the facets
+                            div.entry-count

@@ -30,7 +30,7 @@ $(function() {
 
     function reloadUser() {
         if (!userData) return
-        api.v1.account.self().done(update)
+        loadUserData.done(data => update(data[0], data[1]))
     }
 
     // Let user confirm account deletion before commencing orbital strike
@@ -144,24 +144,25 @@ $(function() {
         }).then(function(){
             return api.v1.collection.isOwner(coll.id)
         }).then(owner => {
-            appendCollection(self, coll, owner)
+            appendCollection(userData, coll, owner)
         })
     }
 
-    function update(self) {
+    function update(self, collections) {
         userData = self
+        userData.collections = collections
         
-        $(".user-email").text(`${self.email} (${self.trust})`)
+        $(".user-email").text(`${userData.email} (${userData.trust})`)
 
         $("div.collection-wrapper").remove()
         document.querySelector(".profile-content")
             .appendChild(el('div.my-collections-container'))
 
-        self.collections.forEach(setupCollection)
-        api.v1.account.friends(self.email).done(data => friends = data)
+        userData.collections.forEach(setupCollection)
+        api.v1.account.friends(userData.email).done(data => friends = data)
     }
 
-    function setup(self) {
+    function setup(self, collections) {
         if (self.trust === "Admin") {
             var a = el('a.view-area-tab.unactive-tab', {href : "/users.html"}, ['users'])
             var b = el('a.view-area-tab.unactive-tab', {href : "/entries.html"}, ['pending entries'])
@@ -172,13 +173,20 @@ $(function() {
             div.insertBefore(c, div.lastChild)
             api.v1.admin.pending().done(showPendingEntries)
         }
-        update(self)
+        update(self, collections)
+    }
+
+    function loadUserData() {
+        return Promise.all([
+            api.v1.account.self(),       /* fetches all collections */
+            api.v1.account.collections() /* fetches collections for current project */
+        ])
     }
 
     // Load logged in user and proceed to setup otherwise redirect to login
-    api.v1.account.self()
-        .done(setup)
-        .fail(xhr => window.location = "/login.html")
+    loadUserData().then(data => {
+        setup(data[0], data[1])
+    }).catch(xhr => window.location = "/login.html")
 
     $("#profile").addClass("current-view");
 })

@@ -25,7 +25,7 @@
 		var modal = el('div#modalConf.modal.confirm', [
 			el('div', [
 				window.modals.closeButton(),
-				el("div.modal-header-title", ['Create new project']),
+				el("h1.text-title", ['Create new project']),
 				el('div.modal-divider'),
 				el('div', [
 					el('label.w-3em', ['name']),

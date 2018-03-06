@@ -1,0 +1,66 @@
+extends ../base
+block view-specific-scripts
+    script(src="//d3js.org/d3.v3.min.js" charset="utf-8")
+    script(src="/js/util/el.js")
+    script(src="/js/central.js")
+    script(src="/js/modal.js")
+    script(src="/js/taxonomy.js")
+    script(src="/js/taxonomy-functionality.js")
+    script(src="/js/util/color.js")
+    script(src="/js/util/el.js")
+    script(src="/js/util/usage.js")
+    script(src="/js/util/treeify.js")
+    script(src="/js/dataset.js")
+    script(src="/js/project.js")
+    script(src="/js/collection/taxonomy.js")
+
+block content
+    div.profile-area-wrapper
+        a(href="/profile.html")#profile.view-area-tab.unactive-tab profile
+        a(href="/collection.html")#general.view-area-tab.unactive-tab general
+        a(href="/collection/taxonomy.html")#taxonomy-tab.view-area-tab.active-tab taxonomy
+        a(href="/collection/users.html")#users.view-area-tab.unactive-tab users
+        a(href="/collection/entries.html")#entries.view-area-tab.unactive-tab entries
+        div.profile-container
+            div.profile-content
+            div.inner-content.light-gray
+                h3#taxonomy-extension.text-title 
+                div.overview-container
+                    div.ov-tax-container
+                        span#taxonomy
+                    div.ov-tax-container        
+                        div#newFacet.newFacetContainer
+                            h2#newFacetBox  Extend Taxonomy
+                            div.divider-wrapper   
+                                div.proj-ui-title-divider
+                                h3#facetName effect
+                                div.proj-ui-title-divider
+                            div.proj-ui-input-container  
+                                div.proj-ui-input-containers
+                                    label.proj-ui-label.data-tip(for="idInput" data-tip="Avoid using characters such as whitespace, '-' '@' '/' etc. Ideally the short name is less than 20 characters. For spacing use: _ ") short name
+                                    input#idInput.submit-input-box(type='text', placeholder='unique id reference for facet', name='id', value=id)
+                                div.proj-ui-input-containers
+                                    label.proj-ui-label.data-tip(for="nameInput" data-tip="This name can be a lot longer and can use any characters. This name will be the property shown when classifying your entries") long name
+                                    input#nameInput.submit-input-box(type='text', placeholder='a more descriptive reference name', name='name', value=name)
+                                div.proj-ui-input-containers
+                                    label.proj-ui-label.data-tip(for="descInput" data-tip="the description can be as long as needed and is used on the project/presentation overview page to give users an idea of the type of classifications to expect with respect to this facet") description
+                                    textarea#descInput.submit-input-box(type='text' placeholder='give a short description of the types of entries this facet classifies' name='desc' value=desc)
+                            div.proj-ui-btn-wrapper
+                                button#submitBtn.btn extend
+                                button#removeBtn.btn remove
+                            div.proj-ui-btn-wrapper
+                                button#saveBtn.btn save
+                                button#resetBtn.btn reset
+                                button#backBtn.btn undo
+                        div#error-messages
+                        div.proj-ui-tool-tip
+                            h3 How To Use
+                            p Click on the facets of the wheel on the left and extend the taxonomy out from the selected facet. You need to input a unique short name,a long name and description.
+                            h3 Legend
+                            div.divider-wrapper
+                                a#baseLegend.proj-ui-taxonomy-ext-Legend
+                                a Base Taxonomy
+                            div.divider-wrapper
+                                a#extendedLegend.proj-ui-taxonomy-ext-Legend
+                                a Extended Taxonomy
+                            

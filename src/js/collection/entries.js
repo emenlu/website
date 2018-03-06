@@ -11,8 +11,8 @@ $(function () {
 	function updateLink(el) {
 		el.setAttribute('href', `${el.getAttribute('href')}#${cID}`)
 	}
+	['general', 'users','taxonomy-tab', 'entries'].forEach(id => updateLink(document.getElementById(id)))
 
-	['general', 'users', 'entries'].forEach(id => updateLink(document.getElementById(id)))
 	document.getElementById('new-entry').addEventListener('click', evt => {
 		window.location = "/submit.html?c=" + cID
 	})
@@ -28,7 +28,7 @@ $(function () {
 			var entries = data[2]
 
 			setupEntries(entries, taxonomy)
-		}).fail(toProfilePage)
+		}).catch(toProfilePage)
 	}
 
 	refresh()
