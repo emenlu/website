@@ -6,7 +6,7 @@
 			var modal = el('div#modalConf.modal.confirm', [
 				el('div', [
 					window.modals.closeButton(),
-					el("div.modal-header-title", [
+					el("h1.text-title", [
 						`Are you sure you want to kick ${userEmail}?`
 					]),
 					el("div#bottom-divider.modal-divider"),

@@ -20,7 +20,7 @@
 		var modal = el('div#modalConf.modal.confirm', [
 			el('div', [
 				window.modals.closeButton(),
-				el("div.modal-header-title", ['Create new collection']),
+				el("h1.text-title", ['Create new collection']),
 				el('div.modal-divider'),
 				collectionName,
 				el("div#bottom-divider.modal-divider"),
@@ -55,5 +55,4 @@
 			window.modals.appear(modal)
 		})
 	}
-
 })(window.components || (window.components = {}));

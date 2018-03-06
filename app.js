@@ -10,7 +10,7 @@ var favicon = require('serve-favicon');
 var errorHandler = require('errorhandler');
 var less = require("less-middleware");
 
-app.set("port", "8181");
+app.set("port", "8182");
 app.set("views", path.join(__dirname, "src", "views"));
 app.set("view engine", "jade");
 app.set('view cache', false)
@@ -74,6 +74,7 @@ app.get("/explore", renderView("explore"))
 app.get("/collection", renderView("collection"))
 app.get("/collection/entries", renderView("collection/entries"))
 app.get("/collection/users", renderView("collection/users"))
+app.get("/collection/taxonomy", renderView("collection/taxonomy"))
 app.get("/resetpassword", renderView("resetpassword"))
 
 app.get("*", function(req, res) {
@@ -92,7 +93,7 @@ server.listen(app.get("port"), function(){
         console.log("You are connected to the live backend server. Be careful.")
     } else {
         console.log("===[ DEV MODE ]===")
-        console.log("Make sure you have the backend server available on port 8080")
+        console.log("Make sure you have the backend server available on port " + app.get("port"))
     }
 });
 

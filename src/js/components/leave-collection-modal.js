@@ -6,13 +6,13 @@
 
 		var modal = el('div#modal.modal', [
             el('div', [
-                closeButton(),
-                el("div.modal-header-title", [obj.desc]),
+                window.modals.closeButton(),
+                el("h1.text-title", [action + ' Collection ' + collectionId +'?']),
                 //name of modal
 
                 el("div.modal-divider"),
                 el("div.modal-sub-item", [
-					`${action} ${title}?`
+					`${action} ?`//`${action} ${title}?`
 				]),
 
                 el("div#bottom-divider.modal-divider"),

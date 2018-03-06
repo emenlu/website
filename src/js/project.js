@@ -1,7 +1,9 @@
 $(function () {
 	/* returned data from project.taxonomy(p): taxonomy and version */
+	var project = window.project = {}
 	var baseTaxonomyData
-
+	var extendedTaxonomyData
+	var cID = window.location.hash.substring(1)
 	var inputs = [
 		document.getElementById('idInput'),
 		document.getElementById('nameInput'),
@@ -95,7 +97,10 @@ $(function () {
 		.innerRadius(d => Math.max(0, y(d.y)))
 		.outerRadius(d => Math.max(0, y(d.y + d.dy)))
 	
-	function renderGraph(nodeId, dataset, taxonomy,serp) {
+	project.renderGraph = function(nodeId, dataset, taxonomy,serp,taxonomyDataSet) {
+		baseTaxonomyData=taxonomyDataSet[0]
+		extendedTaxonomyData=taxonomyDataSet[1]
+
 		var buttonEvents = [ ['submitBtn',submit], ['backBtn',undo], ['resetBtn', reset], ['saveBtn',save], ['removeBtn',remove] ]
 		addEvents()
 		var usage = window.util.computeUsage(dataset, taxonomy)
@@ -335,16 +340,48 @@ $(function () {
 	    }
 
 	    function save(){
-	    	var taxonomyData = {
-	    		taxonomy: serp.flatten(),
-	    		version: baseTaxonomyData.version + 1
-	    	}
-	    	taxonomyData.taxonomy.splice(0, 1) // remove 'root' node
-	    	baseTaxonomyData = taxonomyData
+	    	if(cID)
+	    		saveCollection()
+		    else
+		    	saveProject()
+	    }
 
-	    	return api.v1.project.taxonomy(querystring.p, taxonomyData).then(() => {
-	    		alert("ok")
-	    	}).fail(xhr => alert(xhr.responseText))
+	    function saveCollection(){
+	    	//is collection
+		    	//pop out all base taxonom
+	    	var workingTaxonomy = serp.flatten()
+	    	workingTaxonomy.splice(0, 1) // remove 'root' node
+	    	var newTaxonomyExt = workingTaxonomy.filter(function(match) {
+	    		var isExt=true
+	    		baseTaxonomyData.taxonomy.forEach( current => {
+	    			if(match.id.toLowerCase()==current.id.toLowerCase()){
+	    				isExt=false
+	    			}
+	    		})
+	    		if(isExt)
+  				return match;
+			})
+	    	var taxonomyData = {
+	    		taxonomy: newTaxonomyExt,
+	    		version: extendedTaxonomyData.version + 1
+	    	}
+	    	extendedTaxonomyData = taxonomyData
+	    	return api.v1.collection.taxonomy(cID, taxonomyData).then( () => {
+	    		alert("taxonomy saved")
+	    	}).fail(xhr => alert(xhr.responseText)) 
+		}	
+	   
+	    function saveProject(){
+	    	var taxonomyData = {
+		    		taxonomy: serp.flatten(),
+		    		version: baseTaxonomyData.version + 1
+		    	}
+		    	taxonomyData.taxonomy.splice(0, 1) // remove 'root' node
+		    	baseTaxonomyData = taxonomyData
+
+		    	return api.v1.project.taxonomy(querystring.p, taxonomyData).then(() => {
+		    		alert("ok")
+		    	}).fail(xhr => alert(xhr.responseText))
 	    }
 
 	    function reset() {
@@ -360,16 +397,37 @@ $(function () {
 				currentDepth=1
 				y = d3.scale.pow().exponent(1.3).range([0, radius])
 				//load initial taxonomy
+				if(cID)
+					resetCollection()	
+				else
+					resetProject()	
+		    }	
+	    }
+	    function resetProject(){
+	    	Dataset.loadDefault(data => {
+			    if (!querystring.p) return
+				api.v1.project.taxonomy(querystring.p).then(serp => {
+					baseTaxonomyData = serp
+					var taxonomy = new window.Taxonomy(serp.taxonomy)
+					project.renderGraph('#taxonomy', data, taxonomy, taxonomy.root,[baseTaxonomyData])
+				})
+			})
+	    }
 
-				Dataset.loadDefault(data => {
-				    if (!querystring.p) return
-					api.v1.project.taxonomy(querystring.p).then(serp => {
+	    function resetCollection(){
+	    	Dataset.loadDefault(data => {
+					var baseSerp
+					api.v1.taxonomy().then(serp => {
 						baseTaxonomyData = serp
-						var taxonomy = new window.Taxonomy(serp.taxonomy)
-						renderGraph('#taxonomy', data, taxonomy, taxonomy.root)
+						baseSerp = serp
+					})
+					api.v1.collection.taxonomy(cID).then(serpExt => {
+						extendedTaxonomyData = serpExt
+						var taxonomy = new window.Taxonomy(baseSerp.taxonomy)
+			 			taxonomy.extend(serpExt.taxonomy)
+						project.renderGraph('#taxonomy', data, taxonomy, taxonomy.root,[baseTaxonomyData,extendedTaxonomyData])
 					})
 				})
-		    }	
 	    }
 
 
@@ -440,7 +498,7 @@ $(function () {
 			}
 			clearInputText()
 			/* creates new svg with updates */
-			renderGraph('#taxonomy', dataset, taxonomy, serp)
+			project.renderGraph('#taxonomy', dataset, taxonomy, serp,[baseTaxonomyData, extendedTaxonomyData])
 		}
 
 		/* setup the main graph */
@@ -483,14 +541,6 @@ $(function () {
 				.style("stroke", '#000')
 	}
 
-	Dataset.loadDefault(data => {
-	    if (!querystring.p) return
-		api.v1.project.taxonomy(querystring.p).then(serp => {
-			baseTaxonomyData = serp
-			var taxonomy = new window.Taxonomy(serp.taxonomy)
-			renderGraph('#taxonomy', data, taxonomy, taxonomy.root)
-		})
-	})
 })
 // // only works on live
 // Dataset.loadDefault(data => {

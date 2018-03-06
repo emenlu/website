@@ -28,10 +28,12 @@
 		var modal = el('div#modalConf.modal', [
 			el('div', [
 				window.modals.closeButton(),
-				el("div.modal-header-title", ['Change password']),
+				el("h1.text-title", ['Change password']),
 				el("div.modal-divider"),
-				el('div', [oldEl]),
-				el('div', [newEl]),
+				el("div.modal-container", [
+					el('div', [oldEl]),
+					el('div', [newEl])
+				]),
 				el("div#bottom-divider.modal-divider"),
 				changeBtn,
 				window.modals.cancelButton()

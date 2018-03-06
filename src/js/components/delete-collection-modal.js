@@ -6,7 +6,7 @@
 			var modal = el('div#modalConf.modal.confirm', [
 				el('div', [
 					window.modals.closeButton(),
-					el("div.modal-header-title", [
+					el("h1.text-title", [
 						`Delete collection #${collectionId}?`
 					]),
 					el("div#bottom-divider.modal-divider"),
@@ -27,7 +27,6 @@
 			})
 
 			document.body.appendChild(modal)
-			window.modals.appear(modal)
 		})
 	}
 
