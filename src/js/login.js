@@ -26,7 +26,7 @@ $(document).ready(function() {
     .done(ok => window.location = "/profile.html")
 
     function resetPassword(email) {
-        var req = window.window.api.v1.account.resetPassword(email)
+        var req = window.api.v1.account.resetPassword(email)
 
         req.done(xhr => {
             $(".login-input-area-wrapper").empty()
@@ -51,7 +51,7 @@ $(document).ready(function() {
     }   
 
     function register(email, passw) {
-        var req = window.window.api.v1.account.register(email, passw)
+        var req = window.api.v1.account.register(email, passw)
 
         var notice = "To get full functionality from this website you need to verify your account. An email has been sent to your registered address, please follow the included instructions to complete the process."        
         req.done(xhr => {
