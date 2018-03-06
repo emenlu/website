@@ -10,7 +10,7 @@ var favicon = require('serve-favicon');
 var errorHandler = require('errorhandler');
 var less = require("less-middleware");
 
-app.set("port", "8182");
+app.set("port", "8181");
 app.set("views", path.join(__dirname, "src", "views"));
 app.set("view engine", "jade");
 app.set('view cache', false)
