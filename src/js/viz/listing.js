@@ -34,7 +34,7 @@
 		]).then(data => {
 			var entry = data[0]
 			var clazz = data[1]
-			window.modals.entryModal(CID, entry, taxonomy)
+			window.modals.entryModal(CID, entry, clazz)
 		})
 	}
 
