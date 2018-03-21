@@ -74,7 +74,7 @@ $(function () {
 
 	/* sample y coord of arc for label positioning */
 	function arcY(d) {
-		if (d.name === 'serp')
+		if (d.name === 'root')
 			return 0
 
 		var angle = Math.max(0, Math.min(2 * Math.PI, x(d.x + d.dx * 0.5)))
@@ -96,6 +96,19 @@ $(function () {
 		.endAngle(d => Math.max(0, Math.min(2 * Math.PI, x(d.x + d.dx))))
 		.innerRadius(d => Math.max(0, y(d.y)))
 		.outerRadius(d => Math.max(0, y(d.y + d.dy)))
+
+	var arcOutter = d3.svg.arc()
+		.startAngle(d => Math.max(0, Math.min(2 * Math.PI, x(d.x))))
+		.endAngle(d => Math.max(0, Math.min(2 * Math.PI, x(d.x + d.dx))))
+    	.innerRadius(d => Math.max(0, y(d.y + d.dy)))
+   		.outerRadius(d => Math.max(0, y(d.y + d.dy)) +2 )
+
+	var arcPhantom = d3.svg.arc()
+		.startAngle(d => Math.max(0, Math.min(2 * Math.PI, x(d.x))))
+		.endAngle(d => Math.max(0, Math.min(2 * Math.PI, x(d.x + d.dx))))
+    	.innerRadius(d => Math.max(0, y(d.y)) +3)
+    	.outerRadius(d => Math.max(0, y(d.y + d.dy)) +3 )
+
 	
 	project.renderGraph = function(nodeId, dataset, taxonomy,serp,taxonomyDataSet) {
 		baseTaxonomyData=taxonomyDataSet[0]
@@ -148,6 +161,16 @@ $(function () {
 			.append("g")
 				.attr("id","g")
 				.attr("transform", `translate(${width/2}, ${height/2})`)
+
+		var outterArcs = svg.selectAll("g.outter-arc")
+		    .append("g")
+		    .attr("class", "outter-arc")
+		    .attr("transform", `translate(${width/2}, ${height/2})`)
+		//Set up phantom arc groups
+		var phantomArcs = svg.selectAll("g.phantom-arc")
+		    .append("g")
+		    .attr("class", "phantom-arc")
+		    .attr("transform", `translate(${width/2}, ${height/2})`)
 
        function getParent(label){
 			if(label == 'serp'){
@@ -430,8 +453,6 @@ $(function () {
 				})
 	    }
 
-
-
 		function undo(){
 			var current = operations.pop()
 			if(current){
@@ -452,15 +473,22 @@ $(function () {
 				document.getElementById('facetName').innerText = name.substring(1,12)+"...";
 		}
 
+		function highlight(d){
+			svg.selectAll(".outlines")
+				.style("stroke", d => isBaseTax(d))
+				.attr("fill", d => isBaseTax(d))
+
+			svg.select("#outline"+d.name)
+				.style("stroke", 'black')
+				.attr("fill", 'black')
+		}
+
 		function click(d){
 			$('.complaint').remove()
 			currentFacetName = d.name
 			updateName(d.name)
 			currentDepth = d.depth+1
-			svg.selectAll("path")
-				.style("stroke", '#f2f2f2')
-			svg.select("#path"+d.name)
-				.style("stroke", '#000')
+			highlight(d)
 		}
 
 		function submit(){
@@ -501,17 +529,50 @@ $(function () {
 			project.renderGraph('#taxonomy', dataset, taxonomy, serp,[baseTaxonomyData, extendedTaxonomyData])
 		}
 
+		function isBaseTax(d){
+			var current = serp.dfs(d.name)
+			var isBase = baseTaxonomyData.taxonomy.some( some => {
+	    		return some.id.toLowerCase()==current.id().toLowerCase()
+	    	})
+		    if(isBase || d.name=='root' )
+		    	return '#fff'
+		    else
+		    	return '#ffff33'
+		}
+
 		/* setup the main graph */
 		svg.selectAll("path")
 			.data(partition).enter()
 			.append("path")
-				.attr("d", arc)
-				.attr("id", d=> 'path'+d.name)
-				.style("fill", d => color(d.name)(relativeUse(d)))
-				.style("stroke", d => '#f2f2f2')
-				.on("mousemove", mouseMove)
-				.on("mouseout", mouseOut)
-				.on("click", click)
+			.attr("d", arc)
+			.attr("id", d=> 'path'+d.name)
+			.style("fill", d => color(d.name)(relativeUse(d)))
+			.style('stroke', '#fff')
+			.style('stroke-width', 1.5)
+			.on("mousemove", mouseMove)
+			.on("mouseout", mouseOut)
+			.on("click", click)
+
+		outterArcs
+			.data(partition).enter()
+			.append("path")
+			.attr("id", d => 'outline'+d.name)
+			.attr("class", "outlines")
+		    .attr("fill", d => isBaseTax(d))
+		    .attr("d", arcOutter)
+		    .style('stroke', d=>isBaseTax(d))
+		    .style('stroke-width', 1.8)
+
+		phantomArcs
+			.data(partition).enter()
+			.append("path")
+		    .attr("fill", '#fff')
+		    .attr("fill-opacity", "0.01")
+		    .attr("d", arcPhantom).style('stroke', '#fff')
+		    .style('stroke-width', 1.2)
+		    .on("mousemove", mouseMove)
+			.on("mouseout", mouseOut)
+			.on("click", click)
 
 		/* add labels positioned at area center */
 		svg.selectAll("text")
@@ -519,9 +580,9 @@ $(function () {
 			.append('text')
 			.attr("id", d => 'text'+d.name)
 			.attr('font-family', 'Arial, sans-serif')
-			.attr("transform", function(d) { if(d.name!='serp')return "rotate(" + computeTextRotation(d) + ")"  })
+			.attr("transform", function(d) { if(d.name!='root')return "rotate(" + computeTextRotation(d) + ")"  })
 		    .attr("x", function(d) { return y(d.y); })
-		    .attr("dx",function(d){ if(d.name!='serp') return "6"}) // margin
+		    .attr("dx",function(d){ if(d.name!='root') return "6"}) // margin
 		    .attr("dy", ".35em") // vertical-align
 		    .text(function(d) { return d.name; })
 			.attr('pointer-events', 'none')
