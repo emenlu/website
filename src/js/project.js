@@ -100,13 +100,13 @@ $(function () {
 	var arcOutter = d3.svg.arc()
 		.startAngle(d => Math.max(0, Math.min(2 * Math.PI, x(d.x))))
 		.endAngle(d => Math.max(0, Math.min(2 * Math.PI, x(d.x + d.dx))))
-    	.innerRadius(d => Math.max(0, y(d.y + d.dy)))
+    	.innerRadius(d => Math.max(0, y(d.y + d.dy))  )
    		.outerRadius(d => Math.max(0, y(d.y + d.dy)) +2 )
 
 	var arcPhantom = d3.svg.arc()
 		.startAngle(d => Math.max(0, Math.min(2 * Math.PI, x(d.x))))
 		.endAngle(d => Math.max(0, Math.min(2 * Math.PI, x(d.x + d.dx))))
-    	.innerRadius(d => Math.max(0, y(d.y)) +3)
+    	.innerRadius(d => Math.max(0, y(d.y)) +3 )
     	.outerRadius(d => Math.max(0, y(d.y + d.dy)) +3 )
 
 	
@@ -535,7 +535,7 @@ $(function () {
 	    		return some.id.toLowerCase()==current.id().toLowerCase()
 	    	})
 		    if(isBase || d.name=='root' )
-		    	return '#fff'
+		    	return '#fff' //@super-light-gray
 		    else
 		    	return '#ffff33'
 		}
@@ -548,7 +548,7 @@ $(function () {
 			.attr("id", d=> 'path'+d.name)
 			.style("fill", d => color(d.name)(relativeUse(d)))
 			.style('stroke', '#fff')
-			.style('stroke-width', 1.5)
+			.style('stroke-width', 1.4)
 			.on("mousemove", mouseMove)
 			.on("mouseout", mouseOut)
 			.on("click", click)
@@ -561,15 +561,17 @@ $(function () {
 		    .attr("fill", d => isBaseTax(d))
 		    .attr("d", arcOutter)
 		    .style('stroke', d=>isBaseTax(d))
-		    .style('stroke-width', 1.8)
+		    .style('stroke-width', 2)
 
 		phantomArcs
 			.data(partition).enter()
 			.append("path")
-		    .attr("fill", '#fff')
+			.attr("id", d => 'phantom'+d.name)
+			.attr("class", "phantoms")
+		    .attr("fill", '#E3E3E3')
 		    .attr("fill-opacity", "0.01")
-		    .attr("d", arcPhantom).style('stroke', '#fff')
-		    .style('stroke-width', 1.2)
+		    .attr("d", arcPhantom).style('stroke', '#E3E3E3')
+		    .style('stroke-width', 2)
 		    .on("mousemove", mouseMove)
 			.on("mouseout", mouseOut)
 			.on("click", click)
@@ -588,7 +590,7 @@ $(function () {
 			.attr('pointer-events', 'none')
 			.attr('font-size', 12)
 			.append('tspan')
-				.on("click", click)
+			.on("click", click)
 		svg.select("#textroot")
 			.attr('text-anchor', 'middle')
 			.attr('x', arcX)
@@ -596,6 +598,7 @@ $(function () {
 			//can't extend from root node
 			svg.select('#pathroot').on('click',null);
 			svg.select('#textroot').on('click',null);
+			svg.select('#phantomroot').on('click',null);
 			//sets initial colour to effect
 			var activeName = document.getElementById('facetName').innerText
 			svg.select("#path"+document.getElementById('facetName').activeName)
