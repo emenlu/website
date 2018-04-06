@@ -1,7 +1,8 @@
 $(function () {
 	var isOwner;
 	var toProfilePage = () => window.location = "/profile.html"
-
+	var currentDataSet = undefined
+	var currentTree = undefined
 	// Only allow user to inspect specific collection
 	if (window.location.hash.length === 0)
 		toProfilePage()
@@ -46,6 +47,14 @@ $(function () {
 		return $('#name').innerText
 	}
 
+	$("#matches").click(evt => {
+		Dataset.loadCollection(cID, setUpMap)
+    })
+
+    function setUpMap(set, taxonomy) {
+    	window.components.taxonomyLayoutModal(set,currentTree)
+    }
+
 	$("#profile").addClass("current-view");
 	Dataset.loadDefault(data => {
 		if (!cID) return
@@ -57,6 +66,7 @@ $(function () {
 			var extension = taxonomyData[1]
 			var taxonomy = new window.Taxonomy(serp.taxonomy)
  			taxonomy.extend(extension.taxonomy)
+ 			currentTree = taxonomy
 			window.project.renderGraph('#taxonomy', data, taxonomy, taxonomy.root, taxonomyData)
 		})
 	})
