@@ -16,7 +16,7 @@
 		var serp = taxonomy.tree()
 		var color = window.util.colorScheme(taxonomy)
 		var usage = window.util.computeUsage(dataset, taxonomy)
-
+		
 		serp.map(function init(node) {
 			node.usage = usage[node.id().toLowerCase()]
 			node.map(init)

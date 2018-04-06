@@ -43,9 +43,8 @@ $(function () {
 	/* x-axis should map to a full circle, otherwise strange chart */
 	var x = d3.scale.linear().range([0, 2 * Math.PI])
 
-	var exp = 1.3
 	/* use pow scale to make root node radius smaller */
-	var y = d3.scale.pow().exponent(exp).range([0, radius]);
+	var y = d3.scale.pow().exponent(1.2).range([0, radius]);
 
 	/* compute relative to total number of entries, found in root */
 	function relativeUse(d) {
@@ -74,7 +73,7 @@ $(function () {
 
 	/* sample y coord of arc for label positioning */
 	function arcY(d) {
-		if (d.name === 'serp')
+		if (d.name === 'root')
 			return 0
 
 		var angle = Math.max(0, Math.min(2 * Math.PI, x(d.x + d.dx * 0.5)))
@@ -150,12 +149,12 @@ $(function () {
 				.attr("transform", `translate(${width/2}, ${height/2})`)
 
        function getParent(label){
-			if(label == 'serp'){
-				return 'serp'
+			if(label == 'root'){
+				return 'root'
 			}
 			else{
 				var parent = serp.dfs(label).parentId().toLowerCase()
-				if(parent =='root') parent='serp'
+				if(parent =='root') parent='root'
 				return parent
 			}
 		}
@@ -229,35 +228,28 @@ $(function () {
                 }
 
                 entityClassificiation[newid] = []
-
                 // facetNode.addChild(new FacetNode(newid, newname, [],  facetNode.id()))
                 document.body.removeChild(this)
-
                 rebuild()
             })
         }
 
 	    function mouseMove(d) {
-			if (d.depth === 0) return
+	    	if (d.depth === 0) return
 			svg.select('#text'+d.name)
-		 		.attr('font-size', 14)
-		 		.attr("transform", function() {return "rotate(0)"  })
-		 		.attr('text-anchor', 'middle')
-				.attr('x', arcX)
-				.attr('y', arcY)
-				.attr('dx',"0")
+		 		.attr('font-size', d=>labelScale(d)+ (relativeDepth(d)*2))
 		}
 
 		function mouseOut(d){
 			if (d.depth === 0) return
 		 	svg.select('#text'+d.name)
-				.attr('font-size', 12)
-				.attr("x", function(d) { return y(d.y); })
-		    	.attr("dx",function(d){return "6"}) 
-		    	.attr("y", d.y)
-		    	.attr("transform", function() {return "rotate(" + computeTextRotation(d) + ")"})
-		    	.attr('text-anchor','none')
+				.attr('font-size', d => labelScale(d))
 				.style("text-shadow", "none")
+		}
+
+		function labelScale(d){
+		 	var scale = Math.max(relativeDepth(d)+.5, 1)
+			return 20/scale
 		}
 
     	function complain(where, what) {
@@ -298,8 +290,15 @@ $(function () {
 	    	document.getElementById('g').remove()
 			document.getElementById('svgMain').remove()
 	    }
+	    //allows programatically to click a facet
+	    jQuery.fn.d3Click = function () {
+			  this.each(function (i, e) {
+			    var evt = new MouseEvent("click")
+			    e.dispatchEvent(evt)
+			})
+		}
 
-	     function remove(){
+	    function remove(){
 	    	var head = serp.dfs(currentFacetName)
 	    	if(head.parent=='root'){
 	    		return
@@ -317,6 +316,7 @@ $(function () {
 			parent.tree.splice(y,1)
 			removeFacet(currentFacetName)
 			updateName(head.parent)
+			$("#path"+head.parent).d3Click()
 			clearInputText()
 			//Clear operations list otherwise will give error. undo button works up until last remove sequence.
 			operations = []
@@ -388,49 +388,9 @@ $(function () {
 	    	//modal confirm
 	    	window.modals.confirmPopUp('this will reset any unsaved changes, are you sure??', doIt)
 		    function doIt(){
-		    	//reset everything
-		    	removeEvents()
-				removeSvg()
-				clearInputText()
-				operations = []
-				globalDepth =1
-				currentDepth=1
-				y = d3.scale.pow().exponent(1.3).range([0, radius])
-				//load initial taxonomy
-				if(cID)
-					resetCollection()	
-				else
-					resetProject()	
+		   		location.reload();
 		    }	
 	    }
-	    function resetProject(){
-	    	Dataset.loadDefault(data => {
-			    if (!querystring.p) return
-				api.v1.project.taxonomy(querystring.p).then(serp => {
-					baseTaxonomyData = serp
-					var taxonomy = new window.Taxonomy(serp.taxonomy)
-					project.renderGraph('#taxonomy', data, taxonomy, taxonomy.root,[baseTaxonomyData])
-				})
-			})
-	    }
-
-	    function resetCollection(){
-	    	Dataset.loadDefault(data => {
-					var baseSerp
-					api.v1.taxonomy().then(serp => {
-						baseTaxonomyData = serp
-						baseSerp = serp
-					})
-					api.v1.collection.taxonomy(cID).then(serpExt => {
-						extendedTaxonomyData = serpExt
-						var taxonomy = new window.Taxonomy(baseSerp.taxonomy)
-			 			taxonomy.extend(serpExt.taxonomy)
-						project.renderGraph('#taxonomy', data, taxonomy, taxonomy.root,[baseTaxonomyData,extendedTaxonomyData])
-					})
-				})
-	    }
-
-
 
 		function undo(){
 			var current = operations.pop()
@@ -450,22 +410,139 @@ $(function () {
 				document.getElementById('facetName').innerText = name	
 			else
 				document.getElementById('facetName').innerText = name.substring(1,12)+"...";
+			svg.select("#text"+name)
+				.style("stroke", '#fff')
+		}
+		function relativeDepth(d){
+			return d.depth - tier
+		}
+
+      	function arcTween(d) {
+		  	var xd = d3.interpolate(x.domain(), [d.x, d.x + d.dx]),
+		     	yd = d3.interpolate(y.domain(), [d.y, 1]),
+		      	yr = d3.interpolate(y.range(), [d.y ? 20 : 0, radius]);
+			return function(d, i) {
+		    	return i
+		        ? function(t) { return arc(d); }
+		        : function(t) { x.domain(xd(t)); y.domain(yd(t)).range(yr(t)); return arc(d); };
+		  };
+		}
+
+		function pathWindUp(d,delay){
+			svg.selectAll('text').transition()
+				.attr("opacity", 0)
+				.attr('font-size', d => labelScale(d))
+		  	svg.selectAll("path").transition()
+		  		.duration(600 + delay)
+		  		.attrTween("d",arcTween(d))
+			    .each("end", function(e, i) {
+		        	// check if the animated element's data e lies within the visible angle span given in d
+		          	if (e.name!=='root' && e.x >= d.x && e.x < (d.x + d.dx)) {
+			        // get a selection of the associated text element
+		            var arcText = d3.select("#text"+e.name);
+		            // fade in the text element and recalculate positions
+		            arcText.transition().duration(400 + delay)
+		              .attr("opacity", 1)
+		              .attr("x", arcX)
+		              .attr("y", arcY)
+	        		}
+	        		else{
+			        	svg.select("#textroot")
+			        		.attr('dx',"0")
+			        		.attr("opacity", 1)
+							.attr('text-anchor', 'middle')
+							.attr('x', arcX)
+							.attr('y', arcY)
+			        }
+		    	})
+		}
+		//use to isolate direction of taxonomy exporer
+		function getActiveList(d, list){
+			var children = d.children
+			if (children && children.length > 0) {
+				for (var i = 0; i < children.length; i++) {
+					getActiveList(children[i], list)
+					list.push(children[i])
+				}
+			}
+		}
+
+		function getHiddenItems(reverseList, type){
+			var list = svg.selectAll(type).filter(function(item){
+  				return reverseList.indexOf(item) === -1;
+			})
+			return list
+		}
+		function getActiveItems (reverseList,type){
+			var list = svg.selectAll(type).filter(function(item){
+  				return reverseList.indexOf(item) != -1;
+			})
+			return list
 		}
 
 		function click(d){
+			var rel = relativeDepth(d)
+			if(rel !== 0){
+				var delay = rel > 0 ? (rel*50) : 100
+				// facetInfo(d, delay)
+				toggleMouseEvents(d, true)
+				new Promise(function (F, R) {
+					zoom(d, delay)
+					setTimeout(F, Math.max(1100, 700 + delay))
+				}).then( function () {
+					toggleMouseEvents(d, false)
+				})
+			}
+			if(d.name=='root')
+				return
+			svg.selectAll("text")
+				.style("stroke", 'none')
+			//update ui-interphase
 			$('.complaint').remove()
 			currentFacetName = d.name
 			updateName(d.name)
-			currentDepth = d.depth+1
-			svg.selectAll("path")
-				.style("stroke", '#f2f2f2')
-			svg.select("#path"+d.name)
-				.style("stroke", '#000')
+			currentDepth = d.depth+1	
+		}
+
+		function zoom(d, delay) {
+			var activeList =[]
+			tier = d.depth
+			getActiveList(d, activeList)
+			activeList.push(d)
+			var hiddenText = getHiddenItems(activeList,'text')
+			var activeText = getActiveItems(activeList,'text')
+			//add BackButton
+			svg.selectAll("path").filter( function(path){
+				if(path.name==getParent(d.name)) {
+				 	activeList.push(path)
+				}
+			})
+			var hiddenFacets = getHiddenItems(activeList,'path')
+			var activeFacets = getActiveItems(activeList,'path')
+			activeText[0].forEach(active => {
+				setTimeout(function(){
+					active.classList.remove("hide")
+				}, 300)
+			})
+			hiddenText[0].forEach(hidden => {
+				hidden.classList.add("hide");
+			})
+			pathWindUp(d, delay)
+			activeFacets[0].forEach(active => {
+				active.classList.remove("disappear")
+				active.classList.remove('hide')
+			})
+			hiddenFacets[0].forEach(hidden => {
+			hidden.classList.add("disappear")
+				setTimeout(function(){
+					hidden.classList.add('hide')
+				}, 1100)
+			})
 		}
 
 		function submit(){
 			$('.complaint').remove()
-			var	currentName = document.getElementById('facetName').innerText
+			var	currentName = document.getElementById('facetName').innerText.toLowerCase()
 			let idExists = serp.dfs(inputs[0].value)
 			if(idExists){
 				complain(errorDiv, "Short Name is already in use")
@@ -493,12 +570,16 @@ $(function () {
 			/* update scaling for new svg */
 			if(currentDepth > globalDepth){
 				globalDepth+=1
-				exp = exp-0.15
-				y = d3.scale.pow().exponent(exp).range([0, radius]);
 			}
 			clearInputText()
 			/* creates new svg with updates */
 			project.renderGraph('#taxonomy', dataset, taxonomy, serp,[baseTaxonomyData, extendedTaxonomyData])
+			//slight workaround so that sundial reloads properly and on correct facet
+			$("#path"+x.parent).d3Click()
+			setTimeout(function(){
+				$("#path"+x.short).d3Click()
+			}, 1200)
+			
 		}
 
 		/* setup the main graph */
@@ -519,22 +600,18 @@ $(function () {
 			.append('text')
 			.attr("id", d => 'text'+d.name)
 			.attr('font-family', 'Arial, sans-serif')
-			.attr("transform", function(d) { if(d.name!='serp')return "rotate(" + computeTextRotation(d) + ")"  })
-		    .attr("x", function(d) { return y(d.y); })
-		    .attr("dx",function(d){ if(d.name!='serp') return "6"}) // margin
-		    .attr("dy", ".35em") // vertical-align
+		    .attr('text-anchor', 'middle')
+		    .attr("x", arcX)
+		    .attr("y", arcY)
 		    .text(function(d) { return d.name; })
 			.attr('pointer-events', 'none')
-			.attr('font-size', 12)
-			.append('tspan')
-				.on("click", click)
+			.attr('font-size', d=>labelScale(d))
+
 		svg.select("#textroot")
 			.attr('text-anchor', 'middle')
 			.attr('x', arcX)
 			.attr('y', arcY)
 			//can't extend from root node
-			svg.select('#pathroot').on('click',null);
-			svg.select('#textroot').on('click',null);
 			//sets initial colour to effect
 			var activeName = document.getElementById('facetName').innerText
 			svg.select("#path"+document.getElementById('facetName').activeName)
