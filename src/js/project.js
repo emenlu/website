@@ -22,13 +22,13 @@ $(function () {
             querystring[name] = value
         }
     }
-    var	currentFacetName = document.getElementById('facetName').innerText
+    var	currentFacetName = document.getElementById('facetName').innerText.toLowerCase()
 	/* used to store order in which elements are added so user can reverse operations */
 	var operations = []
 	$('#project-taxonomy').text('extend base-taxonomy for project: ' + querystring.p)
 	/* svg settings */
-	var width = 450
-	var height = 450
+	var width = 400
+	var height = 400
 	var globalDepth = 1
 	var currentDepth =1
 	/* remove -10 to make svg fill the square from edge-to-edge */
@@ -175,10 +175,6 @@ $(function () {
 			}
         }
 
-		function labelScale(d){
-			return 14
-		}
-
 		function putIntoTaxonomy(serp,node,d){
 			serp.tree.forEach( child => {
 				if(child.long.toLowerCase()==d.name.toLowerCase()){
@@ -248,8 +244,22 @@ $(function () {
 		}
 
 		function labelScale(d){
-		 	var scale = Math.max(relativeDepth(d)+.5, 1)
-			return 20/scale
+			if(d.name=='root'){
+				return 12
+			}
+			else if(d.name==currentFacetName){
+				return 20
+			}
+			else if(relativeDepth(d)==0){
+				return 18
+			}
+			else if(relativeDepth(d)==1){
+				return 15
+			}
+			else if(relativeDepth(d)==2){
+				return 13.5
+			}
+			return 12
 		}
 
     	function complain(where, what) {
@@ -411,7 +421,9 @@ $(function () {
 			else
 				document.getElementById('facetName').innerText = name.substring(1,12)+"...";
 			svg.select("#text"+name)
-				.style("stroke", '#fff')
+				.style("stroke", 'black')
+				.style("fill", 'white')
+				.attr("stroke-width", "0.7px")
 		}
 		function relativeDepth(d){
 			return d.depth - tier
@@ -456,12 +468,16 @@ $(function () {
 			        }
 		    	})
 		}
-		//use to isolate direction of taxonomy exporer
-		function getActiveList(d, list){
+		//use to isolate direction of taxonomy explorer
+		function getActiveList(d, list,depth){
+			if (depth==0){
+				return
+			}
 			var children = d.children
 			if (children && children.length > 0) {
 				for (var i = 0; i < children.length; i++) {
-					getActiveList(children[i], list)
+					getActiveList(children[i], list,depth-1)
+					console.log(children[i])
 					list.push(children[i])
 				}
 			}
@@ -497,6 +513,7 @@ $(function () {
 				return
 			svg.selectAll("text")
 				.style("stroke", 'none')
+				.style("fill", 'black')
 			//update ui-interphase
 			$('.complaint').remove()
 			currentFacetName = d.name
@@ -507,7 +524,8 @@ $(function () {
 		function zoom(d, delay) {
 			var activeList =[]
 			tier = d.depth
-			getActiveList(d, activeList)
+			var depth = d.name=='root'? 3:2
+			getActiveList(d, activeList,depth)
 			activeList.push(d)
 			var hiddenText = getHiddenItems(activeList,'text')
 			var activeText = getActiveItems(activeList,'text')
@@ -575,11 +593,14 @@ $(function () {
 			/* creates new svg with updates */
 			project.renderGraph('#taxonomy', dataset, taxonomy, serp,[baseTaxonomyData, extendedTaxonomyData])
 			//slight workaround so that sundial reloads properly and on correct facet
-			$("#path"+x.parent).d3Click()
-			setTimeout(function(){
-				$("#path"+x.short).d3Click()
-			}, 1200)
-			
+			$("#path"+x.parent).d3Click()	
+		}
+
+		function setDepth(d){
+			if(d.depth>3){
+				return true
+			}
+			return false
 		}
 
 		/* setup the main graph */
@@ -590,6 +611,8 @@ $(function () {
 				.attr("id", d=> 'path'+d.name)
 				.style("fill", d => color(d.name)(relativeUse(d)))
 				.style("stroke", d => '#f2f2f2')
+				.classed('hide', d=> setDepth(d) )
+				.classed('disappear', d=> setDepth(d) )
 				.on("mousemove", mouseMove)
 				.on("mouseout", mouseOut)
 				.on("click", click)
@@ -603,20 +626,18 @@ $(function () {
 		    .attr('text-anchor', 'middle')
 		    .attr("x", arcX)
 		    .attr("y", arcY)
-		    .text(function(d) { return d.name; })
-			.attr('pointer-events', 'none')
+		    .attr('pointer-events', 'none')
 			.attr('font-size', d=>labelScale(d))
+		    .classed('hide', d=> setDepth(d) )
+		    .text(function(d) { return d.name; })
 
-		svg.select("#textroot")
-			.attr('text-anchor', 'middle')
-			.attr('x', arcX)
-			.attr('y', arcY)
 			//can't extend from root node
 			//sets initial colour to effect
-			var activeName = document.getElementById('facetName').innerText
-			svg.select("#path"+document.getElementById('facetName').activeName)
-				.style("stroke", '#000')
-	}
+			svg.select("#text"+currentFacetName)
+				.style("stroke", 'black')
+				.style("fill", 'white')
+				.attr("stroke-width", "0.7px")
+	}	
 
 })
 // // only works on live

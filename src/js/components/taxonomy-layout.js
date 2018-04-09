@@ -54,7 +54,7 @@
 			ul.appendChild(containerDiv)
 			if(typeof tree !== 'undefined' && tree.length >0){
 				tree.forEach(function(child){
-					ul.appendChild( getActiveList(child, el('ul.ul-taxonomy-map',[]),font-.25,sqr-0.05) )
+					ul.appendChild( getActiveList(child, el('ul.ul-taxonomy-map',[]),font-.25,sqr-0.065) )
 				})
 			}
 			return ul
