@@ -279,7 +279,8 @@ $(function () {
 		}
 
     	function complain(where, what) {
-    	    where.appendChild(el("div#complaint.complaint.center", [what]));
+    		$('.complaint').remove()
+    	    where.appendChild(el("div#proj_ui_complaint.complaint.center", [what]));
 	    }
 
 	    function validateId(id) {
@@ -573,7 +574,6 @@ $(function () {
 		}
 
 		function submit(){
-			$('.complaint').remove()
 			var	currentName = document.getElementById('facetName').innerText.toLowerCase()
 			let idExists = serp.dfs(inputs[0].value)
 			if(idExists){
