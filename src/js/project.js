@@ -27,12 +27,12 @@ $(function () {
 	var operations = []
 	$('#project-taxonomy').text('extend base-taxonomy for project: ' + querystring.p)
 	/* svg settings */
-	var width = 400
+	var width = 500
 	var height = 400
 	var globalDepth = 1
 	var currentDepth =1
 	/* remove -10 to make svg fill the square from edge-to-edge */
-	var radius = (Math.min(width, height) / 2) - 10
+	var radius = (350) -20
 
 	/* colorScheme is defined in util/color.js */
 	var color = window.util.colorScheme()
@@ -44,7 +44,7 @@ $(function () {
 	var x = d3.scale.linear().range([0, 2 * Math.PI])
 
 	/* use pow scale to make root node radius smaller */
-	var y = d3.scale.pow().exponent(1.2).range([0, radius]);
+	var y = d3.scale.pow().exponent(1).range([0, radius]);
 
 	/* compute relative to total number of entries, found in root */
 	function relativeUse(d) {
@@ -67,7 +67,7 @@ $(function () {
 	/* sample x coord of arc for label positioning */
 	function arcX(d) {
 		var angle = Math.max(0, Math.min(2 * Math.PI, x(d.x + d.dx * 0.5)))
-		var radius = Math.max(0, y(d.y + d.dy * 0.5))
+		var radius = Math.max(0, y(presetY(d) + d.dy * 0.5) )
 		return Math.cos(angle - 0.5 * Math.PI) * radius
 	}
 
@@ -77,7 +77,7 @@ $(function () {
 			return 0
 
 		var angle = Math.max(0, Math.min(2 * Math.PI, x(d.x + d.dx * 0.5)))
-		var radius = Math.max(0, y(d.y + d.dy * 0.5))
+		var radius = Math.max(0, y(presetY(d) + d.dy * 0.5))
 		return Math.sin(angle - 0.5 * Math.PI) * radius
 	}
 
@@ -90,12 +90,28 @@ $(function () {
 	 * The y-axis is used to determine inner and outer radii, while
 	 * the x-axis determines start and end angles for the arc.
 	 */
+
+	//keeps facets the same size for all depths of zoom
+	function presetY(d){
+		var rel = tier == 0 ? d.depth-tier:d.depth-tier+1
+		if(rel<5){
+			return rel *0.125
+		}
+		//default for hidden facets
+		return 0.125
+	}
+
 	var arc = d3.svg.arc()
 		.startAngle(d => Math.max(0, Math.min(2 * Math.PI, x(d.x))))
 		.endAngle(d => Math.max(0, Math.min(2 * Math.PI, x(d.x + d.dx))))
-		.innerRadius(d => Math.max(0, y(d.y)))
-		.outerRadius(d => Math.max(0, y(d.y + d.dy)))
+		.innerRadius(d => Math.max(0, y(presetY(d))) )
+		.outerRadius(d => Math.max(0, y(presetY(d) + d.dy)))
+
 	
+	$("#howToUse").click(evt => {
+		window.components.projUIHelp()
+    })
+
 	project.renderGraph = function(nodeId, dataset, taxonomy,serp,taxonomyDataSet) {
 		baseTaxonomyData=taxonomyDataSet[0]
 		extendedTaxonomyData=taxonomyDataSet[1]
@@ -248,18 +264,18 @@ $(function () {
 				return 12
 			}
 			else if(d.name==currentFacetName){
-				return 20
-			}
-			else if(relativeDepth(d)==0){
 				return 18
 			}
+			else if(relativeDepth(d)==0){
+				return 14
+			}
 			else if(relativeDepth(d)==1){
-				return 15
+				return 12.5
 			}
 			else if(relativeDepth(d)==2){
-				return 13.5
+				return 12
 			}
-			return 12
+			return 11
 		}
 
     	function complain(where, what) {
@@ -421,9 +437,7 @@ $(function () {
 			else
 				document.getElementById('facetName').innerText = name.substring(1,12)+"...";
 			svg.select("#text"+name)
-				.style("stroke", 'black')
-				.style("fill", 'white')
-				.attr("stroke-width", "0.7px")
+				.style("fill", '#FFFB00')
 		}
 		function relativeDepth(d){
 			return d.depth - tier
@@ -431,8 +445,8 @@ $(function () {
 
       	function arcTween(d) {
 		  	var xd = d3.interpolate(x.domain(), [d.x, d.x + d.dx]),
-		     	yd = d3.interpolate(y.domain(), [d.y, 1]),
-		      	yr = d3.interpolate(y.range(), [d.y ? 20 : 0, radius]);
+		     	yd = d3.interpolate(y.domain(), [presetY(d), 1]),
+		      	yr = d3.interpolate(y.range(), [presetY(d) ? 20 : 0, radius]);
 			return function(d, i) {
 		    	return i
 		        ? function(t) { return arc(d); }
@@ -477,7 +491,6 @@ $(function () {
 			if (children && children.length > 0) {
 				for (var i = 0; i < children.length; i++) {
 					getActiveList(children[i], list,depth-1)
-					console.log(children[i])
 					list.push(children[i])
 				}
 			}
@@ -524,7 +537,7 @@ $(function () {
 		function zoom(d, delay) {
 			var activeList =[]
 			tier = d.depth
-			var depth = d.name=='root'? 3:2
+			var depth =3//= d.name=='root'? 3:2
 			getActiveList(d, activeList,depth)
 			activeList.push(d)
 			var hiddenText = getHiddenItems(activeList,'text')
@@ -634,9 +647,7 @@ $(function () {
 			//can't extend from root node
 			//sets initial colour to effect
 			svg.select("#text"+currentFacetName)
-				.style("stroke", 'black')
-				.style("fill", 'white')
-				.attr("stroke-width", "0.7px")
+				.style("fill", '#FFFB00')
 	}	
 
 })

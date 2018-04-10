@@ -72,6 +72,7 @@
 			])
 		])
 		return new Promise(function (F, R) {
+			
 			document.body.appendChild(modal)
 			window.modals.appear(modal)
 		})

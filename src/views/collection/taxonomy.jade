@@ -13,6 +13,7 @@ block view-specific-scripts
     script(src="/js/project.js")
     script(src="/js/collection/taxonomy.js")
     script(src="/js/components/taxonomy-layout.js")
+    script(src="/js/components/proj-ui-help.js")
 
 block content
     div.profile-area-wrapper
@@ -26,8 +27,6 @@ block content
             div.inner-content.light-gray
                 h3#taxonomy-extension.text-title 
                 div.overview-container
-                    div.ov-l-tax-container
-                        span#taxonomy
                     div.ov-r-tax-container       
                         div#newFacet.newFacetContainer
                             h2#newFacetBox  Extend Taxonomy
@@ -53,18 +52,10 @@ block content
                                 button#resetBtn.btn reset
                                 button#backBtn.btn undo
                         div#error-messages
-                        div.proj-ui-tool-tip
-                            h3 How To Use
-                            p Click on the facets of the wheel on the left and extend the taxonomy out from the selected facet. You need to input a unique short name,a long name and description.
-                            h3 Legend
-                            div.collections-taxonomy-ext-legend-container
-                                div.ov-tax-container
-                                    div.divider-wrapper
-                                        a#baseLegend.proj-ui-taxonomy-ext-Legend
-                                        a Base Taxonomy
-                                    div.divider-wrapper
-                                        a#extendedLegend.proj-ui-taxonomy-ext-Legend
-                                        a Extended Taxonomy
-                                div.proj-ui-btn-wrapper
-                                    button#matches.control-btn Layout Map
+                    div.ov-l-tax-container
+                        div.proj-ui-help-btn-wrapper
+                            button#howToUse.control-btn How To Use
+                            button#matches.control-btn Layout Map
+                        span#taxonomy
+                        
                             
