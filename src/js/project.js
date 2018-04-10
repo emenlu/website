@@ -327,8 +327,9 @@ $(function () {
 	    function remove(){
 	    	var head = serp.dfs(currentFacetName)
 	    	if(head.parent=='root'){
-	    		return
-	    	}	
+				complain(errorDiv, "Cannot remove Base Taxonomy")
+				return
+			}
 			var children = head.tree
 			if ( children && children.length > 0 ) {
 				while(children.length > 0){
@@ -537,7 +538,7 @@ $(function () {
 		function zoom(d, delay) {
 			var activeList =[]
 			tier = d.depth
-			var depth =3//= d.name=='root'? 3:2
+			var depth =3
 			getActiveList(d, activeList,depth)
 			activeList.push(d)
 			var hiddenText = getHiddenItems(activeList,'text')
@@ -605,8 +606,8 @@ $(function () {
 			clearInputText()
 			/* creates new svg with updates */
 			project.renderGraph('#taxonomy', dataset, taxonomy, serp,[baseTaxonomyData, extendedTaxonomyData])
-			//slight workaround so that sundial reloads properly and on correct facet
-			$("#path"+x.parent).d3Click()	
+			//zooms into new facet
+			$("#path"+cNode.short).d3Click()
 		}
 
 		function setDepth(d){
