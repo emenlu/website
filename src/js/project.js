@@ -32,7 +32,7 @@ $(function () {
 	var globalDepth = 1
 	var currentDepth =1
 	/* remove -10 to make svg fill the square from edge-to-edge */
-	var radius = (350) -20
+	var radius = (420) -20
 
 	/* colorScheme is defined in util/color.js */
 	var color = window.util.colorScheme()
@@ -67,7 +67,7 @@ $(function () {
 	/* sample x coord of arc for label positioning */
 	function arcX(d) {
 		var angle = Math.max(0, Math.min(2 * Math.PI, x(d.x + d.dx * 0.5)))
-		var radius = Math.max(0, y(presetY(d) + d.dy * 0.5) )
+		var radius = Math.max(0, y(presetY(d) + 0.125 * 0.5) )
 		return Math.cos(angle - 0.5 * Math.PI) * radius
 	}
 
@@ -77,9 +77,9 @@ $(function () {
 			return 0
 
 		var angle = Math.max(0, Math.min(2 * Math.PI, x(d.x + d.dx * 0.5)))
-		var radius = Math.max(0, y(presetY(d) + d.dy * 0.5))
+		var radius = Math.max(0, y(presetY(d) + 0.125 * 0.5))
 		return Math.sin(angle - 0.5 * Math.PI) * radius
-	}
+	} //d.dy=0.125
 
 	function computeTextRotation(d) {
 		return (x(d.x + d.dx / 2) - Math.PI / 2) / Math.PI * 180;
@@ -94,7 +94,7 @@ $(function () {
 	//keeps facets the same size for all depths of zoom
 	function presetY(d){
 		var rel = tier == 0 ? d.depth-tier:d.depth-tier+1
-		if(rel<5){
+		if(rel<4){
 			return rel *0.125
 		}
 		//default for hidden facets
@@ -105,8 +105,8 @@ $(function () {
 		.startAngle(d => Math.max(0, Math.min(2 * Math.PI, x(d.x))))
 		.endAngle(d => Math.max(0, Math.min(2 * Math.PI, x(d.x + d.dx))))
 		.innerRadius(d => Math.max(0, y(presetY(d))) )
-		.outerRadius(d => Math.max(0, y(presetY(d) + d.dy)))
-
+		.outerRadius(d => Math.max(0, y(presetY(d) + 0.125)))
+	//d.dy =0.125
 	
 	$("#howToUse").click(evt => {
 		window.components.projUIHelp()
@@ -264,7 +264,7 @@ $(function () {
 				return 12
 			}
 			else if(d.name==currentFacetName){
-				return 18
+				return 16
 			}
 			else if(relativeDepth(d)==0){
 				return 14
@@ -433,11 +433,11 @@ $(function () {
 		}
 
 		function updateName(name){
-			name = name.toLowerCase()
+			currentFacetName = name = name.toLowerCase()
 			if(name.length<20)
 				document.getElementById('facetName').innerText = name	
 			else
-				document.getElementById('facetName').innerText = name.substring(1,12)+"...";
+				document.getElementById('facetName').innerText = name.substring(0,12)+"...";
 			svg.select("#text"+name)
 				.style("fill", '#FFFB00')
 		}
@@ -531,7 +531,6 @@ $(function () {
 				.style("fill", 'black')
 			//update ui-interphase
 			$('.complaint').remove()
-			currentFacetName = d.name
 			updateName(d.name)
 			currentDepth = d.depth+1	
 		}
@@ -539,7 +538,7 @@ $(function () {
 		function zoom(d, delay) {
 			var activeList =[]
 			tier = d.depth
-			var depth =3
+			var depth =2
 			getActiveList(d, activeList,depth)
 			activeList.push(d)
 			var hiddenText = getHiddenItems(activeList,'text')
@@ -574,7 +573,6 @@ $(function () {
 		}
 
 		function submit(){
-			var	currentName = document.getElementById('facetName').innerText.toLowerCase()
 			let idExists = serp.dfs(inputs[0].value)
 			if(idExists){
 				complain(errorDiv, "Short Name is already in use")
@@ -592,8 +590,8 @@ $(function () {
 			/* removes events from current svg, otherwise these will still be called after current svg is removed */
 			removeEvents()
 			/* create new node and update taxonomy */
-			var cNode = new window.FacetNode(inputs[0].value,inputs[1].value,[],currentName, inputs[2].value)
-			var x = serp.dfs(currentName)
+			var cNode = new window.FacetNode(inputs[0].value,inputs[1].value,[],currentFacetName, inputs[2].value)
+			var x = serp.dfs(currentFacetName)
 			x.addChild(cNode)
 			/* deletes current svg */
 			removeSvg()
@@ -611,7 +609,7 @@ $(function () {
 		}
 
 		function setDepth(d){
-			if(d.depth>3){
+			if(d.depth>2){
 				return true
 			}
 			return false
