@@ -36,7 +36,6 @@
 					return
 				}
 
-				window.modals.toggleButtonState()
 				api.v1.collection.create(collectionName.value)
                 	.done(data => {
                 		document.body.removeChild(modal)
