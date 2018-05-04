@@ -13,14 +13,15 @@ block view-specific-scripts
     script(src="js/project.js")
     script(src="js/info.js")
     script(src="js/modal.js")
+    script(src="/js/components/taxonomy-layout.js")
+    script(src="/js/components/proj-ui-help.js")
+
 
 block content
     div.inner-content.light-gray
-        h3#project-taxonomy.text-title 
+        h3#taxonomy-extension.text-title 
         div.overview-container
-            div.ov-tax-container
-                span#taxonomy
-            div.ov-tax-container        
+            div.ov-r-tax-container       
                 div#newFacet.newFacetContainer
                     h2#newFacetBox  Extend Taxonomy
                     div.divider-wrapper   
@@ -45,7 +46,8 @@ block content
                         button#resetBtn.btn reset
                         button#backBtn.btn undo
                 div#error-messages
-                div.proj-ui-tool-tip
-                    h3 How To Use
-                    p Click on the facets of the wheel on the left and extend the taxonomy out from the selected facet. You need to input a unique short name,a long name and description.
-                
+            div.ov-l-tax-container
+                div.proj-ui-help-btn-wrapper
+                    button#howToUse.control-btn How To Use
+                    button#matches.control-btn Layout Map
+                span#taxonomy
