@@ -9,10 +9,14 @@ var methodOverride = require('method-override');
 var favicon = require('serve-favicon');
 var errorHandler = require('errorhandler');
 var less = require("less-middleware");
+var config = require('./config')
 
-app.set("port", "8181");
-app.set("views", path.join(__dirname, "src", "views"));
-app.set("view engine", "jade");
+app.set("port", config.port);
+app.set("views", [
+   path.join(__dirname, "src", "views"),                 // serve src/views first
+   path.join(__dirname, "shared", "components", "views") 
+]);
+app.set("view engine", "pug");
 app.set('view cache', false)
 app.use(less(path.join(__dirname, "src"), {
     // don't output css in src/less/
@@ -28,6 +32,7 @@ app.use(bodyParser.urlencoded({extended: true}));
 app.use(methodOverride());
 app.use(express.static(path.join(__dirname, "bin"))); // host css
 app.use(express.static(path.join(__dirname, "src"))); // host everything else
+app.use(express.static(path.join(__dirname, "shared", "components"))); // host everything else
 app.use(favicon(path.join(__dirname, "src/favicon.ico")));
 app.use(errorHandler());
 
@@ -42,7 +47,7 @@ if ("development" === env) {
 }
 
 // for simplicity, links may have .html added to allow browsing from
-// local file system. since we want jade templates to be loaded, force
+// local file system. since we want pug templates to be loaded, force
 // browser to load the them instead. by redirection...
 app.use(function(req, res, next) {
     if (req.path.indexOf('.html') >= 0) {
@@ -54,20 +59,22 @@ app.use(function(req, res, next) {
 
 function renderView(page) {
     return function(req, res) {
-        res.render(page);
+        res.render(page, { 
+            settings: config
+        })
     }
 }
 
 app.get("/", renderView('index'));
 app.get("/about", renderView("about"));
 app.get("/profile", renderView("profile"))
-app.get("/project", renderView("project"))
 app.get("/invitations", renderView("invitations"));
 app.get("/users", renderView("users"))
 app.get("/collections", renderView("collections"))
-app.get("/projects", renderView("projects"))
 app.get("/entries", renderView("entries"))
 app.get("/login", renderView("login"))
+app.get("/project", renderView("project"))
+app.get("/projects", renderView("projects"))
 app.get("/search", renderView("search"))
 app.get("/submit", renderView("submit"))
 app.get("/explore", renderView("explore"))
@@ -75,6 +82,9 @@ app.get("/collection", renderView("collection"))
 app.get("/collection/entries", renderView("collection/entries"))
 app.get("/collection/users", renderView("collection/users"))
 app.get("/collection/taxonomy", renderView("collection/taxonomy"))
+app.get("/presentation", renderView("presentation/index"))
+app.get("/presentation/explore", renderView("presentation/explore"))
+app.get("/presentation/search", renderView("presentation/search"))
 app.get("/resetpassword", renderView("resetpassword"))
 
 app.get("*", function(req, res) {
@@ -93,7 +103,7 @@ server.listen(app.get("port"), function(){
         console.log("You are connected to the live backend server. Be careful.")
     } else {
         console.log("===[ DEV MODE ]===")
-        console.log("Make sure you have the backend server available on port " + app.get("port"))
+        console.log("Make sure you have the backend server available on port 8080")
     }
 });
 
