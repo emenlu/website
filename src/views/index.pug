@@ -1,4 +1,4 @@
-extends base
+extends ../../shared/components/views/base
 block view-specific-scripts
     // libraries - d3
     script(src="//d3js.org/d3.v3.min.js" charset="utf-8")
@@ -47,20 +47,6 @@ block content
                     p
                         | The originial taxonomy that kickstarted this project. &#32;
                         a(href="http://test.serpconnect.cs.lth.se").link Explore & contribute here!
-            div.width-40
-                div.facet-explanation
-                    h3 SERP-rto
-                    p
-                        | A presentation of an extension of the SERP-test taxonomy focused on regression testing. &#32;
-                        a(href="http://rto.serpconnect.cs.lth.se").link Explore the results here!
-        div.overview-container
-            div.width-40
-                div.facet-explanation
-                    h3 SERP-security
-                    p
-                        | A presentation of an extension of the SERP taxonomy with security-related facets. &#32;
-                        a(href="http://sec.serpconnect.cs.lth.se").link Explore the results here!
-
     div.inner-content.new-section
         h4.text-title.center
             | Get started
