@@ -1,5 +1,5 @@
 require('./lessc.js')()
-require('./jadec.js')()
+require('./pugc.js')()
 require('./jscpy.js')()
 require('./imgcpy.js')()
 

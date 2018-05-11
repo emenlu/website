@@ -1,7 +1,7 @@
 const ioutil = require('./ioutil.js')
 
 /* allowed image extensions (case-sensitive) */
-var allowed = ['.png', '.jpg', '.jpeg']
+var allowed = ['.png', '.jpg', '.jpeg', '.svg']
 
 /* copy images from serpent/src/img --> serpent/bin/img
  *
@@ -17,4 +17,7 @@ var allowed = ['.png', '.jpg', '.jpeg']
 	ioutil.copy(src, dst)
 }
 
-module.exports = ioutil.process('./src/img/', './bin/img/', copy)
+module.exports = function (file) {
+	ioutil.process('./shared/components/img/', './bin/img/', copy)(file);
+	ioutil.process('./src/img/', './bin/img/', copy)(file);
+}

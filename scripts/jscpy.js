@@ -35,4 +35,7 @@ function compile(file, src, dst) {
 	})
 }
 
-module.exports = ioutil.process('./src/js/', './bin/js/', compile)
+module.exports = function (file) {
+	ioutil.process('./shared/components/js/', './bin/js/', compile)(file);
+	ioutil.process('./src/js/', './bin/js/', compile)(file);
+}
