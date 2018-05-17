@@ -36,12 +36,18 @@ app.use(express.static(path.join(__dirname, "shared", "components"))); // host e
 app.use(favicon(path.join(__dirname, "src/favicon.ico")));
 app.use(errorHandler());
 
-// Run `env=production node app.js` to use dev frontend with prod backend
-// Run `env=development node app.js` to use dev frontend and dev backend
-var env = process.env.env || app.get("env") || "development"
-if ("development" === env) {
+// Run `node app.js --development` to ajax to dev backend
+// Run `node app.js --live` to ajax to shared backend
+var env = process.argv[2] || process.env.env || app.get("env") || "development"
+if ("--development" === env) {
     app.use((req, res, nxt) => {
         res.locals.env = "dev"
+        nxt()
+    })
+}
+if ("--live" === env) {
+    app.use((req, res, nxt) => {
+        res.locals.env = "live"
         nxt()
     })
 }
@@ -92,18 +98,28 @@ app.get("*", function(req, res) {
 });
 
 var server = http.createServer(app);
-server.listen(app.get("port"), function(){
-    console.log("Serving on port " + app.get("port"));
-    console.log("Views, Styles and Javascript files will be updated on each page reload")
-    console.log("Remember to modify `app.js` if you add new views")
-    console.log("Remember to modify `all.less` if you add new less files")
 
-    if (env === "production") {
-        console.log("===[ LIVE MODE ]===")
-        console.log("You are connected to the live backend server. Be careful.")
-    } else {
-        console.log("===[ DEV MODE ]===")
-        console.log("Make sure you have the backend server available on port 8080")
+require('rimraf')('./bin', function (err) {
+    if (err) {
+        throw err
+        return
     }
-});
 
+    server.listen(app.get("port"), function(){
+        console.log("Serving on port " + app.get("port"));
+        console.log("Views, Styles and Javascript files will be updated on each page reload")
+        console.log("Remember to modify `app.js` if you add new views")
+        console.log("Remember to modify `all.less` if you add new less files")
+    
+        if (env === "--live") {
+            console.log("~~~~~~~~~~~~~~~~~~~~~~~( LIVE MODE )~~~~~~~~~~~~~~~~~~~~~~~")
+            console.log("You are connected to the shared live backend server.")
+        } else if (env === "--development") {
+            console.log("========================[ DEV MODE ]========================")
+            console.log("Make sure you have the backend server available on port 8080")
+        } else {
+            console.error("'" + env + "' is not a valid mode: use 'development' or 'live'")
+            process.exit(1)
+        }
+    });
+})

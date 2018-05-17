@@ -3,7 +3,15 @@ var pug = require('pug')
 var ioutil = require('./ioutil.js')
 var config = require('../config')
 
-var prodMode = process.env["BUILD_MODE"] === "prod"
+// prod | live | dev
+var prodMode = (process.argv[2] || process.env["NODE_ENV"] || "unspecified")
+if (prodMode[0] === '-') prodMode = prodMode.substr(2)
+if (prodMode !== "prod" &&
+	prodMode !== 'live' &&
+	prodMode !== 'dev') {
+		console.error("'" + prodMode + "' not valid: use --live, --dev or --prod!")
+		process.exit(1)
+}
 
 /* don't render the layout template */
 var exclude = ['base.pug']
@@ -24,15 +32,14 @@ function render(file, src, dst) {
 	/* xyz.pug --> xyz.html */
 	dst = path.join(path.dirname(dst), path.basename(file.name, file.ext))
 		+ '.html'
-
-	ioutil.log('pugc', src, '-->', dst)
-	var env = prodMode ? "prod" : "dev"
-
-	ioutil.writeFile(dst, pug.renderFile(src, {
+	
+	var html = pug.renderFile(src, {
 		filename: src,
-		env: env,
+		env: prodMode,
 		settings: config
-	}))
+	})
+	ioutil.log('pugc', src, '-->', dst)
+	ioutil.writeFile(dst, html)
 }
 
 module.exports = function (file) {

@@ -4,9 +4,9 @@ const babel = require('babel-core')
 /* libraries that do weird injection stuff and gets broken by babel */
 const exclude = ['sigma.min.js', 'fuse.min.js']
 
-/* babel needs to be told what transforms to use; es2015~ES6 */
+/* babel needs to be told what transforms to use; es2015 */
 const babelOpt = {
-	presets: ['es2015']
+	presets: ["env"]
 }
 
 /* copy/transpile/compile javascript files with babeljs
@@ -19,19 +19,20 @@ function compile(file, src, dst) {
 	if (file.ext !== '.js')
 		return
 
-	ioutil.log('jscpy', src, '-->', dst)
 	if (exclude.some(lib => file.name === lib)) {
 		ioutil.copy(src, dst)
+		ioutil.log('jscpy', src, '-->', dst, '(copy)')		
 		return
 	}
 
 	babel.transformFile(src, babelOpt, (err, res) => {
 		if (err) {
-			console.error(err)
+			ioutil.log('jscpy', src, '-->', dst, err)					
 			return
 		}
 
 		ioutil.writeFile(dst, res.code)
+		ioutil.log('jscpy', src, '-->', dst, '(babel)')				
 	})
 }
 
